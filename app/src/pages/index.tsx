@@ -11,7 +11,7 @@ export default function Home() {
     <>
       <Head>
         <title>Token convert</title>
-        <meta name="description" content="Burn your alphcoins." />
+        <meta name="description" content="Burn your alphcoins and get NFTs." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
