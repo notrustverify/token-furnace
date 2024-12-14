@@ -165,6 +165,7 @@ class Factory extends ContractFactory<
       NFTNotFound: BigInt("1"),
       NFTNotPartOfCollection: BigInt("2"),
       TokenIdNotAccepted: BigInt("4"),
+      CannotBurnZero: BigInt("5"),
     },
   };
 
@@ -246,7 +247,7 @@ export const TokenFurnace = new Factory(
   Contract.fromJson(
     TokenFurnaceContractJson,
     "",
-    "28c45f57b270789058b5a6f61af1da2979b8a10cf536800b2db223a78882bece",
+    "c9c94b714a562cc768fb5aea1e39c1f67ed8ed19092528053a7ce7f75f6982d8",
     []
   )
 );

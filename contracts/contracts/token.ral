@@ -5,7 +5,7 @@ Contract TokenFurnace(
     mut totalSupply: U256
   ) implements INFTCollection {
 
-   event Burned(caller: Address, tokenBurned: ByteVec, amount: U256, nft: Bool)
+   event Burned(caller: Address, tokenBurned: ByteVec, amount: U256, nft: Bool, timestamp: U256)
 
     enum ErrorCodes {
       IncorrectTokenIndex = 0
@@ -20,14 +20,32 @@ Contract TokenFurnace(
    pub fn burn(tokenIdToBurn: ByteVec, amountToBurn: U256, withNft: Bool) -> (){
       let caller = callerAddress!()
       assert!(tokenIdToBurn != ALPH , ErrorCodes.TokenIdNotAccepted)
-      assert!(amount > 0, ErrorCodes.CannotBurnZero)
+      assert!(amountToBurn > 0, ErrorCodes.CannotBurnZero)
       
       if(withNft){
         let _ =  mint{caller -> ALPH: minimalContractDeposit!()}(tokenIdToBurn, amountToBurn, caller)
       }
 
-      emit Burned(caller, tokenIdToBurn, amountToBurn, withNft)
+      emit Burned(caller, tokenIdToBurn, amountToBurn, withNft, blockTimeStamp!())
       burnToken!(caller, tokenIdToBurn, amountToBurn)
+   }
+
+   @using(preapprovedAssets = true, updateFields = true)
+   fn mint(tokenIdBurned: ByteVec, amountBurned: U256, burnerCaller: Address) -> (ByteVec) {
+
+     let (initialImmState, initialMutState) = BurnerNFT.encodeFields!(selfContractId!(), totalSupply, tokenIdBurned, amountBurned)
+ 
+     let contractId = copyCreateSubContractWithToken!{burnerCaller -> ALPH: minimalContractDeposit!()}(
+         toByteVec!(totalSupply),
+         nftTemplateId,
+         initialImmState,
+         initialMutState,
+         1,
+         burnerCaller
+     )
+ 
+     totalSupply = totalSupply + 1
+     return contractId
    }
 
  // collection png https://arweave.net/hoxK8xC9wRjD_6HiOzhdY2jW0ZnJoF2f0N4FcSLXqzQ
@@ -54,24 +72,6 @@ Contract TokenFurnace(
     pub fn validateNFT(nftId: ByteVec, nftIndex: U256) -> () {
         let expectedTokenContract =  nftByIndex(nftIndex)
         assert!(nftId == contractId!(expectedTokenContract), ErrorCodes.NFTNotPartOfCollection)
-    }
-
-    @using(preapprovedAssets = true, updateFields = true)
-    fn mint(tokenIdBurned: ByteVec, amountBurned: U256, burnerCaller: Address) -> (ByteVec) {
-
-      let (initialImmState, initialMutState) = BurnerNFT.encodeFields!(selfContractId!(), totalSupply, tokenIdBurned, amountBurned)
-  
-      let contractId = copyCreateSubContractWithToken!{burnerCaller -> ALPH: minimalContractDeposit!()}(
-          toByteVec!(totalSupply),
-          nftTemplateId,
-          initialImmState,
-          initialMutState,
-          1,
-          burnerCaller
-      )
-  
-      totalSupply = totalSupply + 1
-      return contractId
     }
 
 }

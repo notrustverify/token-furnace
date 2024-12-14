@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from "react";
-import styles from "../styles/Home.module.css";
+import styles from "../styles/FurnacePage.module.css";
 import { getContractFactory, convertToInt, getTokenList, Token, tokenMetadata } from "@/services/utils";
 import { burn } from "@/services/token.service";
 import { AlephiumConnectButton, useBalance, useWallet } from "@alephium/web3-react";
@@ -38,6 +38,7 @@ export const FurnacePage: FC = () => {
   const [tokenList, setTokenList] = useState<Token[]>()
   const [selectedToken, setSelectedToken] = useState<Token | undefined>()
   const [computedBalance, setComputedBalance] = useState<string>('0');
+  const [isCustomToken, setIsCustomToken] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,7 +60,6 @@ export const FurnacePage: FC = () => {
   useEffect(() => {
     const getMetadata = async () => {
       getTokenList().then((data) => {
-        // Filter tokens that exist in user's balance
         const filteredTokens = data.filter(token =>
           balance?.tokenBalances.some((balanceToken: { id: string; amount: number; }) =>
             balanceToken.id === token.id && balanceToken.amount > 0n
@@ -67,12 +67,13 @@ export const FurnacePage: FC = () => {
         );
 
         setTokenList(filteredTokens);
-        setTokenSelect(
-          filteredTokens.map((token) => ({
+        setTokenSelect([
+          { value: 'custom', label: 'Custom Token' },
+          ...filteredTokens.map((token) => ({
             value: token.symbol,
             label: token.symbol
           }))
-        );
+        ]);
       });
     };
     getMetadata();
@@ -115,166 +116,114 @@ export const FurnacePage: FC = () => {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "5px",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "100vh",
-      }}
-    >
-
-
-
+    <div className={styles.container}>
       {isLoading ? (
         <div>Loading...</div>
       ) : (
         <>
           <AlephiumConnectButton />
-          <h1>Token Furnace</h1>
-          <div >
-            <div className="w-full max-w-[90vw] px-4 sm:max-w-[80vw]">
-              <Image
-                src="/burnmeme.webp"
-                alt="Burn Meme"
-                width={800}
-                height={480}
-                className="w-full h-auto"
-                style={{
-                  objectFit: 'contain',
-                  maxHeight: '40vh',
-                  width: '100%',
-                  height: 'auto',
+          <h1 className={styles.title}>Token Furnace</h1>
+          <div className={styles.imageContainer}>
+            <Image
+              src="/burnmeme.webp"
+              alt="Burn Meme"
+              width={100}
+              height={100}
+              className={styles.burnImage}
+              priority
+            />
+          </div>
+          <div>
+            <p className={styles.title}>Select a token to burn</p>
+            <div className={styles.selectContainer}>
+              <Select
+                options={tokenSelect}
+                isSearchable={true}
+                isClearable={true}
+                onChange={(option) => {
+                  if (option?.value === 'custom') {
+                    setIsCustomToken(true);
+                    setSelectedToken(undefined);
+                  } else {
+                    setIsCustomToken(false);
+                    setSelectedToken(tokenList?.find((token) => token.symbol === option?.label));
+                  }
+                }}
+                value={tokenSelect?.find(option => option.value === selectedToken?.symbol)}
+                styles={{
+                  control: (baseStyles) => ({
+                    ...baseStyles,
+                    width: '173px',
+                  }),
                 }}
               />
             </div>
+            
+            {isCustomToken && (
+              <div className={styles.tokenInputContainer}>
+                <p className={styles.noTokensText}>
+                  Enter custom token ID:
+                </p>
+                <input
+                  type="text"
+                  placeholder="Enter token ID"
+                  onChange={(e) => {
+                    setSelectedToken({
+                      id: e.target.value,
+                      symbol: 'Custom Token',
+                      decimals: 0,
+                      name: 'Custom Token',
+                      description: 'Custom Token',
+                      logoURI: ''
+                    })
+                  }}
+                  className={styles.tokenInput}
+                />
+              </div>
+            )}
           </div>
-          <div>
 
-            <p>Select a token to burn</p>
-            <Select
-              options={tokenSelect}
-              isSearchable={true}
-              isClearable={true}
-              onChange={(option) => setSelectedToken(tokenList?.find((token) => token.symbol === option?.label))}
-              value={tokenSelect?.find(function (option) {
-                return option.value === selectedToken?.symbol
-              })}
-              styles={{
-                control: (baseStyles) => ({
-                  ...baseStyles,
-                  width: '173px',  // This matches the default input width
-                }),
-              }}
-            />
+          <div className={styles.balanceContainer}>
+            Available Balance: {Number(computedBalance).toFixed(2)} {selectedToken?.symbol}
           </div>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '100px',
-              marginTop: '10px',
-            }}
-          >Available Balance: {Number(computedBalance).toFixed(2)} {selectedToken?.symbol}</div>
+
           <div>
             <input
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              style={{
-                padding: "8px",
-                fontSize: "14px",
-                marginRight: "10px",
-                borderRadius: "4px",
-                border: "1px solid #ccc",
-              }}
+              className={styles.amountInput}
             />
           </div>
-          <div>
-              <input
-                disabled
-                type="checkbox"
-                checked={withNft}
-                onChange={(e) => setWithNft(e.target.checked)}
-                style={{
-                  cursor: "not-allowed",  // Change cursor to indicate disabled state
-                  opacity: 0.6            // Reduce opacity for disabled appearance
-                }}
-              />
-              <span style={{ 
-                color: "#888888",  // Grey color for disabled text
-                opacity: 0.6       // Matching opacity with checkbox
-              }}>
-                Receive NFT (cost 0.1 ALPH)
-              </span>
-          </div>
+
           <div>
             <button
               onClick={() => setAmount((Number(computedBalance) * 0.1).toString())}
               disabled={isLoading || connectionStatus !== 'connected'}
-              style={{
-                padding: "8px 16px",
-                fontSize: "14px",
-                marginRight: "10px",
-                borderRadius: "4px",
-                border: "1px solid #ccc",
-                cursor: isLoading || connectionStatus !== 'connected' ? "not-allowed" : "pointer",
-                backgroundColor: isLoading || connectionStatus !== 'connected' ? "#cccccc" : "#007bff",
-                color: "white",
-              }}
+              className={styles.percentageButton}
             >
               10%
             </button>
             <button
               onClick={() => setAmount((Number(computedBalance) * 0.5).toString())}
               disabled={isLoading || connectionStatus !== 'connected'}
-              style={{
-                padding: "8px 16px",
-                fontSize: "14px",
-                marginRight: "10px",
-                borderRadius: "4px",
-                border: "1px solid #ccc",
-                cursor: isLoading || connectionStatus !== 'connected' ? "not-allowed" : "pointer",
-                backgroundColor: isLoading || connectionStatus !== 'connected' ? "#cccccc" : "#007bff",
-                color: "white",
-              }}
+              className={styles.percentageButton}
             >
               50%
             </button>
             <button
               onClick={() => setAmount(computedBalance)}
               disabled={isLoading || connectionStatus !== 'connected'}
-              style={{
-                padding: "8px 16px",
-                fontSize: "14px",
-                borderRadius: "4px",
-                border: "1px solid #ccc",
-                cursor: isLoading || connectionStatus !== 'connected' ? "not-allowed" : "pointer",
-                backgroundColor: isLoading || connectionStatus !== 'connected' ? "#cccccc" : "#007bff",
-                color: "white",
-              }}
+              className={styles.percentageButton}
             >
               Max
             </button>
           </div>
 
           <button
-            className={styles.button}
             onClick={handleConvert}
             disabled={isLoading || connectionStatus !== 'connected' || selectedToken?.symbol === 'ALPH'}
-            style={{
-              padding: "12px 24px",
-              fontSize: "16px",
-              cursor: isLoading || connectionStatus !== 'connected' || selectedToken?.symbol === 'ALPH' ? "not-allowed" : "pointer",
-              backgroundColor: isLoading || connectionStatus !== 'connected' || selectedToken?.symbol === 'ALPH' ? "#cccccc" : "#007bff",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-            }}
+            className={styles.burnButton}
           >
             {selectedToken?.symbol === 'ALPH' ? 'Cannot burn ALPH' : 'Burn'}
           </button>

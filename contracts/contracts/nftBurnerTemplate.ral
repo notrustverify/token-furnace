@@ -8,7 +8,7 @@ Contract BurnerNFT(
 ) implements INFT {
   
   pub fn getTokenUri() -> ByteVec {
-    return b`data:application/json,{"tokenId":"` ++ tokenIdBurned ++ b`", "amount":"` ++ u256ToString!(amountBurned) ++ b`"timestamp": `++ u256ToString!(blockTimeStamp!()) ++ b`"}`
+    return b`data:application/json,{"tokenIdBurned":"` ++ tokenIdBurned ++ b`", "amountBurned":"` ++ u256ToString!(amountBurned) ++ b`"timestamp": `++ u256ToString!(blockTimeStamp!()) ++ b`"}`
   }
 
   pub fn getCollectionIndex() -> (ByteVec, U256) {
