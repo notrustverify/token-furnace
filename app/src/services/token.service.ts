@@ -4,7 +4,7 @@ import {
   MINIMAL_CONTRACT_DEPOSIT,
   SignerProvider,
 } from "@alephium/web3";
-import { contractFactory } from "./utils";
+import { getContractFactory } from "./utils";
 
 
 export const burn = async (
@@ -13,12 +13,13 @@ export const burn = async (
   decimalsAmount: number,
   tokenIdToBurn: string,
   tokenDecimals: number,
-  withNft: boolean
+  withNft: boolean,
+  groupIndex: number
 ): Promise<ExecuteScriptResult> => {
   const decimalsPower = BigInt(tokenDecimals-decimalsAmount)
   console.log(amount * 10n ** decimalsPower)
 
-  return await contractFactory.transact.burn({
+  return await getContractFactory(groupIndex).transact.burn({
     args: {
       amountToBurn: amount * 10n ** decimalsPower,
       tokenIdToBurn: tokenIdToBurn,

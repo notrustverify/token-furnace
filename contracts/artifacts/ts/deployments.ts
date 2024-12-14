@@ -19,25 +19,31 @@ import { default as devnetDeployments } from "../../deployments/.deployments.dev
 export type Deployments = {
   deployerAddress: string;
   contracts: {
-    BurnerNFT: DeployContractExecutionResult<BurnerNFTInstance>;
-    TokenFurnace: DeployContractExecutionResult<TokenFurnaceInstance>;
+    BurnerNFT?: DeployContractExecutionResult<BurnerNFTInstance>;
+    TokenFurnace?: DeployContractExecutionResult<TokenFurnaceInstance>;
   };
 };
 
 function toDeployments(json: any): Deployments {
   const contracts = {
-    BurnerNFT: {
-      ...json.contracts["BurnerNFT"],
-      contractInstance: BurnerNFT.at(
-        json.contracts["BurnerNFT"].contractInstance.address
-      ),
-    },
-    TokenFurnace: {
-      ...json.contracts["TokenFurnace"],
-      contractInstance: TokenFurnace.at(
-        json.contracts["TokenFurnace"].contractInstance.address
-      ),
-    },
+    BurnerNFT:
+      json.contracts["BurnerNFT"] === undefined
+        ? undefined
+        : {
+            ...json.contracts["BurnerNFT"],
+            contractInstance: BurnerNFT.at(
+              json.contracts["BurnerNFT"].contractInstance.address
+            ),
+          },
+    TokenFurnace:
+      json.contracts["TokenFurnace"] === undefined
+        ? undefined
+        : {
+            ...json.contracts["TokenFurnace"],
+            contractInstance: TokenFurnace.at(
+              json.contracts["TokenFurnace"].contractInstance.address
+            ),
+          },
   };
   return {
     ...json,

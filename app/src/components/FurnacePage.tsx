@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from "react";
 import styles from "../styles/Home.module.css";
-import { contractFactory, convertToInt, getTokenList, Token, tokenMetadata } from "@/services/utils";
+import { getContractFactory, convertToInt, getTokenList, Token, tokenMetadata } from "@/services/utils";
 import { burn } from "@/services/token.service";
 import { AlephiumConnectButton, useBalance, useWallet } from "@alephium/web3-react";
 import { ONE_ALPH, web3 } from "@alephium/web3";
@@ -44,7 +44,7 @@ export const FurnacePage: FC = () => {
       try {
         setIsLoading(true);
         // Replace this with your actual data fetching logic
-        setContractState(await contractFactory.fetchState());
+       if(connectionStatus === 'connected') setContractState(await getContractFactory(account?.group).fetchState());
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -106,7 +106,8 @@ export const FurnacePage: FC = () => {
         floatToDecimals[1],
         selectedToken?.id ?? '',
         selectedToken?.decimals ?? 0,
-        withNft
+        withNft,
+        account?.group
       );
       updateBalanceForTx(tx.txId, 1)
     }

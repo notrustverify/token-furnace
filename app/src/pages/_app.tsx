@@ -7,7 +7,7 @@ import {getNetwork} from '@/services/utils'
 export default function App({ Component, pageProps }: AppProps) {
 
   return (
-    <AlephiumWalletProvider theme="web95" network={getNetwork()} addressGroup={0}>
+    <AlephiumWalletProvider theme="web95" network={getNetwork()}>
       <Component {...pageProps} />
     </AlephiumWalletProvider>
   )
