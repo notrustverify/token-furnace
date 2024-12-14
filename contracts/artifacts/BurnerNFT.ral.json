@@ -1,0 +1,54 @@
+{
+  "version": "v3.8.5",
+  "name": "BurnerNFT",
+  "bytecode": "05024048405301000000010b144022646174613a6170706c69636174696f6e2f6a736f6e2c7b22746f6b656e4964223a22ce0244140d222c2022616d6f756e74223a2244ce0389441402227d4402010000000203ce00ce0102",
+  "codeHash": "c23a88b49c10b4bcd35f802d42e866bd3381475c392720ec134ada4b5e1c8193",
+  "fieldsSig": {
+    "names": [
+      "collectionId",
+      "nftIndex",
+      "tokenIdBurned",
+      "amountBurned",
+      "__stdInterfaceId"
+    ],
+    "types": [
+      "ByteVec",
+      "U256",
+      "ByteVec",
+      "U256",
+      "ByteVec"
+    ],
+    "isMutable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "eventsSig": [],
+  "functions": [
+    {
+      "name": "getTokenUri",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "getCollectionIndex",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "ByteVec",
+        "U256"
+      ]
+    }
+  ],
+  "constants": [],
+  "enums": [],
+  "stdInterfaceId": "0003"
+}

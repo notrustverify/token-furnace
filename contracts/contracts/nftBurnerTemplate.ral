@@ -1,0 +1,19 @@
+import "std/nft_interface"
+
+Contract BurnerNFT(
+  collectionId: ByteVec,
+  nftIndex: U256,
+  tokenIdBurned: ByteVec,
+  amountBurned: U256
+) implements INFT {
+  
+  pub fn getTokenUri() -> ByteVec {
+    return b`data:application/json,{"tokenId":"` ++ tokenIdBurned ++ b`", "amount":"` ++ u256ToString!(amountBurned) ++ b`"}`
+  }
+
+  pub fn getCollectionIndex() -> (ByteVec, U256) {
+    return collectionId, nftIndex
+  }
+
+
+}
