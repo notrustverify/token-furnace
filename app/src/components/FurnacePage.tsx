@@ -97,8 +97,13 @@ export const FurnacePage: FC = () => {
       return;
     }
 
-    if (signer && contractState) {
+    if (amount === computedBalance) {
+      if (!window.confirm(`Are you sure you want to burn all your ${selectedToken?.symbol} tokens?`)) {
+        return;
+      }
+    }
 
+    if (signer && contractState) {
       const floatToDecimals = convertToInt(amount)
       console.log(floatToDecimals)
       const tx = await burn(
