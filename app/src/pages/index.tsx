@@ -3,7 +3,6 @@ import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { AlephiumConnectButton, useWallet } from '@alephium/web3-react'
 import { ConvertPage } from '@/components/ConvertPage'
-import { DepositPage } from '@/components/Deposit'
 
 export default function Home() {
   const { connectionStatus } = useWallet()
