@@ -12,7 +12,7 @@ Contract TokenFurnace(
       NFTNotFound = 1
       NFTNotPartOfCollection = 2
       TokenIdNotAccepted = 4
-
+      CannotBurnZero = 5
     }
 
 
@@ -20,6 +20,7 @@ Contract TokenFurnace(
    pub fn burn(tokenIdToBurn: ByteVec, amountToBurn: U256, withNft: Bool) -> (){
       let caller = callerAddress!()
       assert!(tokenIdToBurn != ALPH , ErrorCodes.TokenIdNotAccepted)
+      assert!(amount > 0, ErrorCodes.CannotBurnZero)
       
       if(withNft){
         let _ =  mint{caller -> ALPH: minimalContractDeposit!()}(tokenIdToBurn, amountToBurn, caller)
