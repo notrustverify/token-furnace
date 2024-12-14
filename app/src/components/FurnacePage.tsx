@@ -1,12 +1,14 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useCallback, useEffect, useState } from "react";
 import styles from "../styles/FurnacePage.module.css";
 import { getContractFactory, convertToInt, getTokenList, Token, tokenMetadata } from "@/services/utils";
 import { burn } from "@/services/token.service";
 import { AlephiumConnectButton, useBalance, useWallet } from "@alephium/web3-react";
-import { ONE_ALPH, web3 } from "@alephium/web3";
+import { node, ONE_ALPH, web3 } from "@alephium/web3";
 import { TokenFurnaceTypes } from "my-contracts";
 import Select from 'react-select'
 import Image from 'next/image'  // Add this import
+import { BurnSummary } from "./BurnSummary";
+import { CSSTransition, SwitchTransition } from 'react-transition-group';
 
 
 web3.setCurrentNodeProvider(
@@ -39,6 +41,7 @@ export const FurnacePage: FC = () => {
   const [selectedToken, setSelectedToken] = useState<Token | undefined>()
   const [computedBalance, setComputedBalance] = useState<string>('0');
   const [isCustomToken, setIsCustomToken] = useState(false);
+  const [txId, setTxId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,6 +82,7 @@ export const FurnacePage: FC = () => {
     getMetadata();
   }, [contractState, balance]);
 
+
   useEffect(() => {
     if (balance && selectedToken) {
       const tokenBalance = balance.tokenBalances.find((token: { id: string; }) => token.id === selectedToken.id);
@@ -115,6 +119,7 @@ export const FurnacePage: FC = () => {
         withNft,
         account?.group
       );
+      setTxId(tx.txId)
       updateBalanceForTx(tx.txId, 1)
     }
     console.log("Convert button clicked with amount:", amount);
@@ -129,20 +134,43 @@ export const FurnacePage: FC = () => {
           <AlephiumConnectButton />
           <h1 className={styles.title}>Token Furnace</h1>
           <div className={styles.imageContainer}>
-            <Image
-              src="/burnmeme.webp"
-              alt="Burn Meme"
-              width={100}
-              height={100}
-              className={styles.burnImage}
-              priority
-            />
+            <SwitchTransition>
+              <CSSTransition
+                key={txId ? 'summary' : 'image'}
+                timeout={300}
+                classNames={{
+                  enter: styles.fadeEnter,
+                  enterActive: styles.fadeEnterActive,
+                  exit: styles.fadeExit,
+                  exitActive: styles.fadeExitActive,
+                }}
+              >
+                {txId ? (
+                  <BurnSummary 
+                  amount={amount}
+                  tokenSymbol={selectedToken?.symbol}
+                  txId={txId}
+                  logoURI={selectedToken?.logoURI}
+                />
+                ) : (
+                  <Image
+                    src="/burnmeme.webp"
+                    alt="Burn Meme"
+                    width={100}
+                    height={100}
+                    className={styles.burnImage}
+                    priority
+                  />
+                )}
+              </CSSTransition>
+            </SwitchTransition>
           </div>
           <div>
             <p className={styles.title}>Select a token to burn</p>
             <div className={styles.selectContainer}>
               <Select
                 options={tokenSelect}
+                isDisabled={isLoading || connectionStatus !== 'connected'}
                 isSearchable={true}
                 isClearable={true}
                 onChange={(option) => {
@@ -194,6 +222,7 @@ export const FurnacePage: FC = () => {
 
           <div>
             <input
+              disabled={isLoading || connectionStatus !== 'connected'}
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
@@ -223,6 +252,19 @@ export const FurnacePage: FC = () => {
             >
               Max
             </button>
+          </div>
+          
+          <div className={styles.checkboxContainer}>
+            <label className={styles.checkboxLabel}>
+              <input
+                disabled
+                type="checkbox"
+                checked={withNft}
+                onChange={(e) => setWithNft(e.target.checked)}
+                className={styles.checkbox}
+              />
+              Receive NFT (cost 0.1 ALPH)
+            </label>
           </div>
 
           <button

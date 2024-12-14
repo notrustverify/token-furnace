@@ -19,11 +19,8 @@ export const TxStatus = ({ txId, txStatusCallback }: TxStatusAlertProps) => {
   return (
     <>
       <h3 style={{ margin: 0 }}>
-        Transaction status: <code>{txStatus?.type || 'unknown'}</code>
       </h3>
-      <h3 style={{ margin: 0 }}>
-        Transaction hash: <code>{txId}</code>
-      </h3>
+      
     </>
   )
 }
