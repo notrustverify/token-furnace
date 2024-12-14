@@ -1,0 +1,101 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.title {
+  text-align: center;
+}
+
+.selectContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.tokenInputContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.tokenInput {
+  padding: 8px;
+  font-size: 14px;
+  width: 173px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+.noTokensText {
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+}
+
+.balanceContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 100px;
+  margin-top: 10px;
+}
+
+.amountInput {
+  padding: 8px;
+  font-size: 14px;
+  margin-right: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.percentageButton {
+  padding: 8px 16px;
+  font-size: 14px;
+  margin-right: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  color: white;
+  background-color: #007bff;
+  cursor: pointer;
+}
+
+.percentageButton:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.burnButton {
+  padding: 12px 24px;
+  font-size: 16px;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  cursor: pointer;
+}
+
+.burnButton:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.imageContainer {
+  width: 60%;
+  max-width: 300px;
+  margin: 20px auto;
+  padding: 0 20px;
+}
+
+.burnImage {
+  width: 100%;
+  height: auto;
+  max-height: 30vh;
+  object-fit: contain;
+} 
