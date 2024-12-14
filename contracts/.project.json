@@ -1,5 +1,5 @@
 {
-  "fullNodeVersion": "v3.8.0",
+  "fullNodeVersion": "v3.8.5",
   "compilerOptionsUsed": {
     "ignoreUnusedConstantsWarnings": false,
     "ignoreUnusedVariablesWarnings": false,
@@ -13,9 +13,9 @@
   "infos": {
     "BurnerNFT": {
       "sourceFile": "nftBurnerTemplate.ral",
-      "sourceCodeHash": "613e856f8cbaa73d637c223ce5f24b3504c5bfd34c919900eebb75996c9c9ade",
+      "sourceCodeHash": "d03d6517f75df9eac8da6a2d61062c73ad88c0bbd96a252410970ad1468d7a7c",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "c23a88b49c10b4bcd35f802d42e866bd3381475c392720ec134ada4b5e1c8193"
+      "codeHashDebug": "8335ec3cc9c7f2e9d28a87089c4848c2a90c56a478009d132e7496b8b9c026be"
     },
     "INFT": {
       "sourceFile": "../../node_modules/@alephium/web3/std/nft_interface.ral",

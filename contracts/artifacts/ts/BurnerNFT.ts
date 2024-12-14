@@ -143,7 +143,7 @@ export const BurnerNFT = new Factory(
   Contract.fromJson(
     BurnerNFTContractJson,
     "",
-    "c23a88b49c10b4bcd35f802d42e866bd3381475c392720ec134ada4b5e1c8193",
+    "8335ec3cc9c7f2e9d28a87089c4848c2a90c56a478009d132e7496b8b9c026be",
     []
   )
 );
