@@ -1,62 +1,73 @@
-# My Next.js dApp with pages router
+# Token Furnace dApp
 
-This template monorepo was designed to provide a developer-friendly experience to Alephium ecosystem newcomers. It is split into 2 parts:
+A decentralized application built on Alephium that allows users to burn their tokens. The dApp features a simple interface for selecting and burning both listed and custom tokens.
 
-- app: contains the Next.js frontend part of the dApp
-- contracts: contains the dApp contracts
+## Features
 
-It uses **yarn workspaces** to manage both app and contract projects from the monorepo root.
+- Connect with Alephium wallet
+- Select from available tokens in your wallet
+- Burn custom tokens by entering token ID
+- Quick amount selection (10%, 50%, Max)
+- Real-time balance display
+- Safety check preventing ALPH burns
 
-## Local development
+## Getting Started
 
-To get started quickly, follow these steps:
+### Prerequisites
 
-### Set up a devnet
+- Node.js
+- Yarn
+- Alephium wallet
+- Access to Alephium network (devnet, testnet, or mainnet)
 
-Start a local devnet for testing and development. Please refer to the [Getting Started documentation](https://docs.alephium.org/full-node/getting-started#devnet).
+### Installation
 
-### Install dependencies
-
+1. Clone the repository:
+```bash
+git clone <repository-url>
 ```
+
+2. Install dependencies:
+```bash
 yarn install
 ```
 
-### Compile the contracts
-
-```
+3. Compile and deploy contracts:
+```bash
 yarn compile
-```
-
-### Deploy the contracts
-
-```
 yarn deploy
-```
-
-### Build the contracts package
-
-```
 yarn build:contracts
 ```
 
-### Run the app
-
-```
+4. Start the development server:
+```bash
 yarn dev
 ```
 
-### Install an Alephium wallet
+### Configuration
 
-Download an [Alephium wallet](https://alephium.org/#wallets), and connect it to your devnet dApp.
-
-## Testnet, Mainnet, and More
-
-You could use yarn workspace to run commands in the contracts or app directory.
-
+Set your Alephium node URL in the environment variables:
 ```
-yarn <my-contracts|my-dapp> <command>
+NEXT_PUBLIC_NODE_URL=<your-node-url>
+NEXT_PUBLIC_NETWORK=<devnet|testnet|mainnet>
 ```
 
-You could also get some testnet tokens from the [Faucet](https://docs.alephium.org/infrastructure/public-services/#testnet-faucet).
+## Development
 
-To learn more about smart contract development on Alephium, take a look at the [documentation](https://docs.alephium.org/dapps/).
+The project is structured as a monorepo with two main parts:
+- `app/`: Next.js frontend
+- `contracts/`: Alephium smart contracts
+
+### Running Tests
+
+```bash
+yarn test
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+[Add your license here]
