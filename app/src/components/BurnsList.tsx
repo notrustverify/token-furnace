@@ -41,6 +41,7 @@ export const BurnsList: React.FC = () => {
   const [tokenList, setTokenList] = useState<Token[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [totalBurns, setTotalBurns] = useState<number>(0);
 
   web3.setCurrentNodeProvider(
     (process.env.NEXT_PUBLIC_NODE_URL as string) ??
@@ -67,7 +68,7 @@ export const BurnsList: React.FC = () => {
       // Subscribe to events from all four contract factories
       for (let i = 0; i < 4; i++) {
         getContractFactory(i).subscribeBurnedEvent({
-          pollingInterval: 5000,
+          pollingInterval: 15000,
           messageCallback: async (
             event: TokenFurnaceTypes.BurnedEvent
           ): Promise<void> => {
@@ -123,11 +124,30 @@ export const BurnsList: React.FC = () => {
     fetchHistoricalBurns();
   }, []);
 
+  useEffect(() => {
+    async function fetchTotalBurns() {
+      let total = 0;
+      for (let i = 0; i < 4; i++) {
+        try {
+          const count = await getContractFactory(i).getContractEventsCurrentCount();
+          total += Number(count);
+        } catch (error) {
+          console.error(`Error fetching burns count for group ${i}:`, error);
+        }
+      }
+      setTotalBurns(total);
+    }
+    fetchTotalBurns();
+  }, []);
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
     <div className={styles.container}>
+      <div className={styles.totalBurns}>
+        Total Burns: {totalBurns}
+      </div>
       <div className={styles.list}>
         {burns.map((burn) => (
           <div key={burn.txId} className={styles.burnItem}>

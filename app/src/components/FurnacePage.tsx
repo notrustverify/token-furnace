@@ -90,6 +90,7 @@ export const FurnacePage: FC = () => {
       const tokenBalance = balance.tokenBalances.find((token: { id: string; }) => token.id === selectedToken.id);
       if (tokenBalance) {
         const balanceWithDecimals = (Number(tokenBalance.amount) / Math.pow(10, selectedToken.decimals));
+        console.log(balanceWithDecimals)
         setComputedBalance(balanceWithDecimals.toString());
       } else {
         setComputedBalance('0');
