@@ -17,6 +17,12 @@ interface BurnEvent {
   group: number;
 }
 
+interface BurnerStats {
+  address: string;
+  totalBurns: number;
+  uniqueTokens: Set<string>;
+}
+
 const formatAmount = (amount: string, decimals: number): string => {
   const num = Number(amount) / Math.pow(10, decimals);
   if (num >= 1e9) return (num / 1e9).toFixed(1) + 'B';
@@ -42,10 +48,11 @@ export const BurnsList: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalBurns, setTotalBurns] = useState<number>(0);
+  const [topBurners, setTopBurners] = useState<BurnerStats[]>([]);
 
   web3.setCurrentNodeProvider(
     (process.env.NEXT_PUBLIC_NODE_URL as string) ??
-    "https://fullnode-testnet.alephium.notrustverify.ch",
+    "https://fullnode-testnet.alephium.org/",
     undefined,
     undefined
   );
@@ -87,6 +94,7 @@ export const BurnsList: React.FC = () => {
             };
 
             setBurns(prevBurns => [newBurn, ...prevBurns]);
+            updateTopBurners(newBurn);
             return Promise.resolve();
           },
           errorCallback: (
@@ -140,13 +148,61 @@ export const BurnsList: React.FC = () => {
     fetchTotalBurns();
   }, []);
 
+  const updateTopBurners = (newBurn: BurnEvent) => {
+    setTopBurners(prevBurners => {
+      const burnerMap = new Map<string, BurnerStats>();
+      
+      // Convert previous burners to map
+      prevBurners.forEach(burner => {
+        burnerMap.set(burner.address, {
+          address: burner.address,
+          totalBurns: burner.totalBurns,
+          uniqueTokens: burner.uniqueTokens
+        });
+      });
+      
+      // Update or add new burner
+      const existingBurner = burnerMap.get(newBurn.burner) || {
+        address: newBurn.burner,
+        totalBurns: 0,
+        uniqueTokens: new Set<string>()
+      };
+      
+      existingBurner.totalBurns += 1;
+      existingBurner.uniqueTokens.add(newBurn.tokenId);
+      burnerMap.set(newBurn.burner, existingBurner);
+      
+      // Convert map back to array and sort
+      return Array.from(burnerMap.values())
+        .sort((a, b) => b.totalBurns - a.totalBurns)
+        .slice(0, 5); // Keep top 5 burners
+    });
+  };
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
     <div className={styles.container}>
-      <div className={styles.totalBurns}>
-        Total Burns: {totalBurns}
+      <div className={styles.topBurners}>
+        <div className={styles.totalBurns}>
+          Total Burns: {totalBurns}
+        </div>
+        <h3>Top Burners</h3>
+        <div className={styles.topBurnersList}>
+          {topBurners.map((burner, index) => (
+            <div key={burner.address} className={styles.topBurnerItem}>
+              <span className={styles.rank}>#{index + 1}</span>
+              <span className={styles.address}>
+                {burner.address.substring(0, 6)}...
+                {burner.address.substring(burner.address.length - 4)}
+              </span>
+              <span className={styles.stats}>
+                {burner.totalBurns} burns ({burner.uniqueTokens.size} tokens)
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
       <div className={styles.list}>
         {burns.map((burn) => (
