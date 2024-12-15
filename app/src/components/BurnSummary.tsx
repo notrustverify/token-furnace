@@ -2,6 +2,19 @@ import React from 'react';
 import Image from 'next/image';
 import styles from "../styles/BurnSummary.module.css";
 
+const humanizeNumber = (num: number): string => {
+  if (num >= 1000000000) {
+    return (num / 1000000000).toFixed(2) + 'B';
+  }
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(2) + 'M';
+  }
+  if (num >= 1000) {
+    return (num / 1000).toFixed(2) + 'K';
+  }
+  return num.toFixed(2);
+};
+
 interface BurnSummaryProps {
   amount: string;
   tokenSymbol?: string;
@@ -11,6 +24,8 @@ interface BurnSummaryProps {
 
 export const BurnSummary: React.FC<BurnSummaryProps> = ({ amount, tokenSymbol, txId, logoURI }) => {
   if (!txId) return null;
+
+  const humanizedAmount = humanizeNumber(Number(amount));
 
   return (
     <div className={styles.summaryContainer}>
@@ -25,7 +40,7 @@ export const BurnSummary: React.FC<BurnSummaryProps> = ({ amount, tokenSymbol, t
             className={styles.tokenLogo}
           />
         )}
-       {' '} You burned {Number(amount).toFixed(2)} {tokenSymbol}</p>
+       {' '} You burned {humanizedAmount} {tokenSymbol}</p>
       </div>
       <a 
         href={`https://explorer.alephium.org/transactions/${txId}`}

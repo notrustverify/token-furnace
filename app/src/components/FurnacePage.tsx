@@ -42,6 +42,7 @@ export const FurnacePage: FC = () => {
   const [computedBalance, setComputedBalance] = useState<string>('0');
   const [isCustomToken, setIsCustomToken] = useState(false);
   const [txId, setTxId] = useState<string | undefined>(undefined);
+  const [showSummary, setShowSummary] = useState(false);
   const nodeRef = useRef(null);
 
   useEffect(() => {
@@ -96,6 +97,17 @@ export const FurnacePage: FC = () => {
     }
   }, [balance, selectedToken]);
 
+  useEffect(() => {
+    setShowSummary(false);
+    setTxId(undefined);
+  }, [amount, selectedToken]);
+
+  useEffect(() => {
+    if (txId) {
+      setShowSummary(true);
+    }
+  }, [txId]);
+
   const handleConvert = async () => {
     if (!amount) {
       alert("Please enter an amount");
@@ -109,21 +121,24 @@ export const FurnacePage: FC = () => {
     }
 
     if (signer) {
-      const floatToDecimals = convertToInt(amount)
-      console.log(floatToDecimals)
-      const tx = await burn(
-        signer,
-        floatToDecimals[0],
-        floatToDecimals[1],
-        selectedToken?.id ?? '',
-        selectedToken?.decimals ?? 0,
-        withNft,
-        account?.group
-      );
-      setTxId(tx.txId)
-      updateBalanceForTx(tx.txId, 1)
+      try {
+        const floatToDecimals = convertToInt(amount)
+        console.log(floatToDecimals)
+        const tx = await burn(
+          signer,
+          floatToDecimals[0],
+          floatToDecimals[1],
+          selectedToken?.id ?? '',
+          selectedToken?.decimals ?? 0,
+          withNft,
+          account?.group
+        );
+        setTxId(tx.txId)
+        updateBalanceForTx(tx.txId, 1)
+      } catch (error) {
+        console.error("Error during burn:", error);
+      }
     }
-    console.log("Convert button clicked with amount:", amount);
   };
 
   return (
@@ -137,7 +152,7 @@ export const FurnacePage: FC = () => {
           <div className={styles.imageContainer}>
             <SwitchTransition>
               <CSSTransition
-                key={txId ? 'summary' : 'image'}
+                key={showSummary ? 'summary' : 'image'}
                 timeout={300}
                 classNames={{
                   enter: styles.fadeEnter,
@@ -148,7 +163,7 @@ export const FurnacePage: FC = () => {
                 nodeRef={nodeRef}
               >
                 <div ref={nodeRef}>
-                  {txId ? (
+                  {showSummary ? (
                     <BurnSummary 
                       amount={amount}
                       tokenSymbol={selectedToken?.symbol}
