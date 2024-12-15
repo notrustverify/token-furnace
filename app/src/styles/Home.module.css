@@ -7,8 +7,8 @@
 .header {
   width: 100%;
   padding: 1rem;
-  background-color: #ffffff;
-  border-bottom: 1px solid #eaeaea;
+  background-color: var(--color-bg);
+  border-bottom: 1px solid var(--color-bg-secondary);
 }
 
 .nav {
@@ -22,15 +22,15 @@
 .navLink {
   display: inline-block;
   padding: 0.5rem 1rem;
-  background-color: #f0f0f0;
-  border-radius: 4px;
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--border-radius);
   text-decoration: none;
-  color: #333;
+  color: var(--color-text);
   transition: background-color 0.2s;
 }
 
 .navLink:hover {
-  background-color: #e0e0e0;
+  background-color: var(--color-accent);
 }
 
 .main {

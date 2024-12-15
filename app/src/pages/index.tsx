@@ -4,6 +4,7 @@ import styles from '@/styles/Home.module.css'
 import { AlephiumConnectButton, useWallet } from '@alephium/web3-react'
 import { FurnacePage } from '@/components/FurnacePage'
 import Link from 'next/link'
+import { Footer } from '@/components/Footer'
 
 export default function Home() {
   const { connectionStatus } = useWallet()
@@ -29,6 +30,8 @@ export default function Home() {
       <main className={styles.main}>
         <FurnacePage />
       </main>
+
+      <Footer />
     </div>
   )
 }

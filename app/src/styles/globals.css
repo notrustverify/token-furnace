@@ -1,5 +1,6 @@
 * {
   box-sizing: border-box;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .columns {
@@ -41,20 +42,18 @@
   --width-content: 1080px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color: #0097fc;
-    --color-accent: #0097fc4f;
-    --color-bg: #333;
-    --color-bg-secondary: #555;
-    --color-link: #0097fc;
-    --color-secondary: #e20de9;
-    --color-secondary-accent: #e20de94f;
-    --color-shadow: rgba(0, 0, 0, 0.2);
-    --color-table: #0097fc;
-    --color-text: #f7f7f7;
-    --color-text-secondary: #aaa;
-  }
+[data-theme='dark'] {
+  --color: #0097fc;
+  --color-accent: #0097fc4f;
+  --color-bg: #1a1a1a;
+  --color-bg-secondary: #2a2a2a;
+  --color-link: #0097fc;
+  --color-secondary: #e20de9;
+  --color-secondary-accent: #e20de94f;
+  --color-shadow: rgba(0, 0, 0, 0.2);
+  --color-table: #0097fc;
+  --color-text: #f7f7f7;
+  --color-text-secondary: #aaa;
 }
 
 /* Layout */
