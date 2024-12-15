@@ -9,6 +9,7 @@ import Select from 'react-select'
 import Image from 'next/image'  // Add this import
 import { BurnSummary } from "./BurnSummary";
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
+import { useTheme } from '@/hooks/useTheme';
 
 
 web3.setCurrentNodeProvider(
@@ -44,6 +45,7 @@ export const FurnacePage: FC = () => {
   const [txId, setTxId] = useState<string | undefined>(undefined);
   const [showSummary, setShowSummary] = useState(false);
   const nodeRef = useRef(null);
+  const { theme } = useTheme();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -153,6 +155,44 @@ export const FurnacePage: FC = () => {
     }
   };
 
+  const selectStyles = {
+    control: (base: any) => ({
+      ...base,
+      background: 'var(--color-bg)',
+      borderColor: 'var(--color-bg-secondary)',
+      '&:hover': {
+        borderColor: 'var(--color-link)'
+      }
+    }),
+    menu: (base: any) => ({
+      ...base,
+      background: 'var(--color-bg)',
+      border: '1px solid var(--color-bg-secondary)'
+    }),
+    option: (base: any, state: any) => ({
+      ...base,
+      backgroundColor: state.isFocused 
+        ? 'var(--color-bg-secondary)' 
+        : 'var(--color-bg)',
+      color: 'var(--color-text)',
+      '&:hover': {
+        backgroundColor: 'var(--color-bg-secondary)'
+      }
+    }),
+    singleValue: (base: any) => ({
+      ...base,
+      color: 'var(--color-text)'
+    }),
+    input: (base: any) => ({
+      ...base,
+      color: 'var(--color-text)'
+    }),
+    placeholder: (base: any) => ({
+      ...base,
+      color: 'var(--color-text-secondary)'
+    })
+  };
+
   return (
     <div className={styles.container}>
       {isLoading ? (
@@ -203,6 +243,7 @@ export const FurnacePage: FC = () => {
                 isDisabled={isLoading || connectionStatus !== 'connected'}
                 isSearchable={true}
                 isClearable={true}
+                styles={selectStyles}
                 onChange={(option) => {
                   if (option?.value === 'custom') {
                     setIsCustomToken(true);
