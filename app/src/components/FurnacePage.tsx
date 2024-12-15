@@ -68,9 +68,9 @@ export const FurnacePage: FC = () => {
     const getMetadata = async () => {
       getTokenList().then((data) => {
         const filteredTokens = data.filter(token =>
-          balance?.tokenBalances.some((balanceToken: { id: string; amount: number; }) =>
+          balance?.tokenBalances?.some((balanceToken: { id: string; amount: number; }) =>
             balanceToken.id === token.id && balanceToken.amount > 0n
-          )
+          ) ?? false
         );
 
         setTokenList(filteredTokens);
@@ -88,15 +88,16 @@ export const FurnacePage: FC = () => {
 
 
   useEffect(() => {
-    if (balance && selectedToken) {
+    if (balance?.tokenBalances && selectedToken) {
       const tokenBalance = balance.tokenBalances.find((token: { id: string; }) => token.id === selectedToken.id);
       if (tokenBalance) {
         const balanceWithDecimals = (Number(tokenBalance.amount) / Math.pow(10, selectedToken.decimals));
-        console.log(balanceWithDecimals)
         setComputedBalance(balanceWithDecimals.toString());
       } else {
         setComputedBalance('0');
       }
+    } else {
+      setComputedBalance('0');
     }
   }, [balance, selectedToken]);
 
