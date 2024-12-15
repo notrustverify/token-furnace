@@ -1,5 +1,5 @@
 {
-  "fullNodeVersion": "v3.8.5",
+  "fullNodeVersion": "v3.8.0",
   "compilerOptionsUsed": {
     "ignoreUnusedConstantsWarnings": false,
     "ignoreUnusedVariablesWarnings": false,
@@ -13,9 +13,9 @@
   "infos": {
     "BurnerNFT": {
       "sourceFile": "nftBurnerTemplate.ral",
-      "sourceCodeHash": "757d6d1621985aa6b2cbdb0ad36127a5ea5568cf1b1a646c40136a939a341f98",
+      "sourceCodeHash": "9b803ac0100dbecf88333770ffbb14c54d6974328b5c25e4041fdc8976c9cd67",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "a504d969a9e653a0dd5ee6fccd97011c15cac0da57196e6bae93b0fef0a903c0"
+      "codeHashDebug": "ffae952fe6cc5d21121111f70cdf7efbef389db89bd3ac70fbc836a215cd1ebf"
     },
     "INFT": {
       "sourceFile": "../../node_modules/@alephium/web3/std/nft_interface.ral",
@@ -31,9 +31,9 @@
     },
     "TokenFurnace": {
       "sourceFile": "token.ral",
-      "sourceCodeHash": "c4c52cf2062e966e787fa93c45570d08471e2d23987f60fd70f758c4d0a7d818",
+      "sourceCodeHash": "eb39abd2d70c662931afc27e04ca1cf7a297e0280abb9d3e6f27ef85d6c2a33a",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "c9c94b714a562cc768fb5aea1e39c1f67ed8ed19092528053a7ce7f75f6982d8"
+      "codeHashDebug": "11bcc1d38a1102dd3248456682ae5b953fa88d7e3cd984efea3cddf84fe0b45a"
     }
   }
 }

@@ -107,7 +107,7 @@ export const FurnacePage: FC = () => {
       }
     }
 
-    if (signer && contractState) {
+    if (signer) {
       const floatToDecimals = convertToInt(amount)
       console.log(floatToDecimals)
       const tx = await burn(
@@ -257,7 +257,7 @@ export const FurnacePage: FC = () => {
           <div className={styles.checkboxContainer}>
             <label className={styles.checkboxLabel}>
               <input
-                disabled
+                disabled={isLoading || connectionStatus !== 'connected'}
                 type="checkbox"
                 checked={withNft}
                 onChange={(e) => setWithNft(e.target.checked)}

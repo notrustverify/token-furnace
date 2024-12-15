@@ -18,8 +18,10 @@ export const burn = async (
 ): Promise<ExecuteScriptResult> => {
   const decimalsPower = BigInt(tokenDecimals-decimalsAmount)
   console.log(amount * 10n ** decimalsPower)
+  console.log(amount * 10n ** decimalsPower)
 
-  return await getContractFactory(groupIndex).transact.burn({
+  const contract = getContractFactory(groupIndex)
+  return await contract.transact.burn({
     args: {
       amountToBurn: amount * 10n ** decimalsPower,
       tokenIdToBurn: tokenIdToBurn,

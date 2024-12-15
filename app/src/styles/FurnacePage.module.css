@@ -105,16 +105,27 @@
 }
 
 .checkboxLabel {
-    display: flex;
-    align-items: center;
     gap: 8px;
-    color: #999;
-    opacity: 0.6;
+
 }
 
 .checkbox {
-    cursor: not-allowed;
+    margin-right: 5px;
+}
+
+.checkboxContainer:has(input:disabled) {
     opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.checkboxContainer:has(input:disabled) .checkboxLabel {
+    color: #999;
+    cursor: not-allowed;
+}
+
+.checkboxContainer:has(input:disabled) .checkbox {
+    background-color: #cccccc;
+    cursor: not-allowed;
 }
 
 .fadeEnter {

@@ -51,6 +51,7 @@ export namespace TokenFurnaceTypes {
     tokenBurned: HexString;
     amount: bigint;
     nft: boolean;
+    timestamp: bigint;
   }>;
 
   export interface CallMethodTable {
@@ -247,7 +248,7 @@ export const TokenFurnace = new Factory(
   Contract.fromJson(
     TokenFurnaceContractJson,
     "",
-    "c9c94b714a562cc768fb5aea1e39c1f67ed8ed19092528053a7ce7f75f6982d8",
+    "11bcc1d38a1102dd3248456682ae5b953fa88d7e3cd984efea3cddf84fe0b45a",
     []
   )
 );
