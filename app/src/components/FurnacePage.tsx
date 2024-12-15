@@ -126,6 +126,7 @@ export const FurnacePage: FC = () => {
 
     if (signer) {
       try {
+        
         const floatToDecimals = convertToInt(amount)
         console.log(floatToDecimals)
         const tx = await burn(

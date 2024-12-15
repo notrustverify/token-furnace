@@ -26,14 +26,22 @@ export interface TokenFaucetConfig {
 }
 
 
-export const convertToInt = (withdrawAmount: string):[bigint, number] => {
-  let amountToWithdrawFloat = ''
+export const convertToInt = (withdrawAmount: string): [bigint, number] => {
+  // Convert scientific notation to regular decimal
+  const normalizedNumber = Number(withdrawAmount).toLocaleString('fullwide', {
+    useGrouping: false,
+    maximumFractionDigits: 20
+  })
 
-  if (withdrawAmount.split('.').length > 0)
-    amountToWithdrawFloat = withdrawAmount.split('.')[0] + withdrawAmount.split('.')[1]
+  // Split the number into integer and decimal parts
+  const [integerPart, decimalPart = ''] = normalizedNumber.split('.')
+
+  // Combine integer and decimal parts without the decimal point
+  const fullNumber = integerPart + decimalPart
+
   return [
-    withdrawAmount.split('.').length > 1 ? BigInt(amountToWithdrawFloat) : BigInt(withdrawAmount),
-    withdrawAmount.split('.').length > 1 ? Number(withdrawAmount.split('.')[1].length) : Number(0)
+    BigInt(fullNumber),
+    decimalPart.length
   ]
 }
 
