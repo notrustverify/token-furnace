@@ -54,7 +54,7 @@ export const getContractFactory = (groupIndex: number) => {
     0: "1GBvuTs4TosNB9xTCGJL5wABn2xTYCzwa7MnXHphjcj1y",
     1: "1HYFRU5D4QAGr5H9ySbkSHRmBjRriV8JtCxE4YCW4jwVu",
     2: "19LjHzaohNvgq2tNZXxXZsVEHq5NuTuDS7Kth85Qo8zm1",
-    3: "1BfB1LyWaohFV3SkKQBT7j7SZ4hfHRTAbhtNxu4VVCT2E"
+    3: "19YzSyYrwAH7VwVM5KPuAKmK89Chvk9gXup6753VZGUcB"
   }
 
   const deployerAddress = deployerAddresses[groupIndex]
