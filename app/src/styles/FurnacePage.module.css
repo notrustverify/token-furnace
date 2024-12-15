@@ -1,10 +1,10 @@
 .container {
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    justify-content: center;
+    gap: 2px;
+    justify-content: flex-start;
     align-items: center;
-    min-height: 100vh;
+    width: 100%;
 }
 
 .title {
@@ -87,16 +87,18 @@
 }
 
 .imageContainer {
-    width: 60%;
-    max-width: 300px;
+    width: 80%;
+    max-width: 500px;
     margin: 20px auto;
     padding: 0 20px;
+    min-height: 200px;
+    position: relative;
 }
 
 .burnImage {
     width: 100%;
     height: auto;
-    max-height: 30vh;
+    max-height: 50vh;
     object-fit: contain;
 }
 

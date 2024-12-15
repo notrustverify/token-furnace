@@ -153,7 +153,7 @@ export const BurnsList: React.FC = () => {
                 {formatAmount(burn.amount, burn.decimals)} burned
               </span>
               <span>by {burn.burner.substring(0, 6)}...{burn.burner.substring(burn.burner.length - 4)}</span>
-              <span>Group {burn.group}</span>
+              <small>Group {burn.group}</small>
               <span>{formatDate(burn.timestamp)}</span>
             </div>
             <a

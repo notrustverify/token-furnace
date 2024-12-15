@@ -141,13 +141,23 @@ export const FurnacePage: FC = () => {
     }
   };
 
+  const handleMaxClick = () => {
+    if (selectedToken && balance) {
+      const tokenBalance = balance.tokenBalances.find((token: { id: string; }) => token.id === selectedToken.id);
+      if (tokenBalance) {
+        // Convert the raw balance to the correct decimal representation
+        const balanceWithDecimals = (Number(tokenBalance.amount) / Math.pow(10, selectedToken.decimals));
+        setAmount(balanceWithDecimals.toString());
+      }
+    }
+  };
+
   return (
     <div className={styles.container}>
       {isLoading ? (
         <div>Loading...</div>
       ) : (
         <>
-          <AlephiumConnectButton />
           <h1 className={styles.title}>Token Furnace</h1>
           <div className={styles.imageContainer}>
             <SwitchTransition>
@@ -260,7 +270,7 @@ export const FurnacePage: FC = () => {
               50%
             </button>
             <button
-              onClick={() => setAmount(computedBalance)}
+              onClick={handleMaxClick}
               disabled={isLoading || connectionStatus !== 'connected'}
               className={styles.percentageButton}
             >
