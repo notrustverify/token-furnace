@@ -8,9 +8,9 @@ Contract BurnerNFT(
 ) implements INFT {
   
   pub fn getTokenUri() -> ByteVec {
-    // b`data:application/json,{"name": "Burn ` ++ u256ToString!(nftIndex)  ++ b`", "attributes": [{"trait_type": "Token id", "value": "` ++ tokenIdBurned ++ b`"}, {"trait_type": "Amount burned", "value": "` ++ u256ToString!(amountBurned) ++ b`"}, {"trait_type": "Timestamp", "value": "`++ u256ToString!(blockTimeStamp!()) ++ b`"}]}`
+    //let _ =  b`data:application/json,{"name": "Burn ` ++ u256ToString!(nftIndex)  ++ b`", "attributes": [{"trait_type": "Token id", "value": "` ++ tokenIdBurned ++ b`"}, {"trait_type": "Amount burned", "value": "` ++ u256ToString!(amountBurned) ++ b`"}, {"trait_type": "Timestamp", "value": "`++ u256ToString!(blockTimeStamp!()) ++ b`"}]}`
 
-    return b`data:application/json,{"name": "Burn ` ++ u256ToString!(nftIndex)  ++ b`", "attributes": [{"trait_type": "Amount burned", "value": "` ++ u256ToString!(amountBurned) ++ b`"}, {"trait_type": "Timestamp", "value": "`++ u256ToString!(blockTimeStamp!()) ++ b`"}]}`
+    return b`data:application/json,{"name": "Burn ` ++ u256ToString!(nftIndex)  ++ b`", "attributes": [{"trait_type": "Amount burned", "value": ` ++ u256ToString!(amountBurned) ++ b`}, {"trait_type": "Timestamp", "value": `++ u256ToString!(blockTimeStamp!()) ++ b`}, {"trait_type": "Token Id", "value": "`++ tokenIdBurned ++ b`"}]}`
   }
 
   pub fn getCollectionIndex() -> (ByteVec, U256) {

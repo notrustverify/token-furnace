@@ -13,9 +13,9 @@
   "infos": {
     "BurnerNFT": {
       "sourceFile": "nftBurnerTemplate.ral",
-      "sourceCodeHash": "9b803ac0100dbecf88333770ffbb14c54d6974328b5c25e4041fdc8976c9cd67",
+      "sourceCodeHash": "72c2cae349a7e1317f5ffb23ea445f347a4a53c6e8dc42ad78da660a0d127513",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "ffae952fe6cc5d21121111f70cdf7efbef389db89bd3ac70fbc836a215cd1ebf"
+      "codeHashDebug": "de86ba673a50975a76b894d00590f4c907220136a3c32573024885245e6f5b75"
     },
     "INFT": {
       "sourceFile": "../../node_modules/@alephium/web3/std/nft_interface.ral",
@@ -31,9 +31,9 @@
     },
     "TokenFurnace": {
       "sourceFile": "token.ral",
-      "sourceCodeHash": "eb39abd2d70c662931afc27e04ca1cf7a297e0280abb9d3e6f27ef85d6c2a33a",
+      "sourceCodeHash": "5e03f93f3dcb4b095665834e08fd4084832329c0edc518b5cac33fb3b8eb7c8a",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "11bcc1d38a1102dd3248456682ae5b953fa88d7e3cd984efea3cddf84fe0b45a"
+      "codeHashDebug": "50ccbe01cffce5726f4970af1bd140ad734c437e114593f7ef66b28bc13fedac"
     }
   }
 }

@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useState } from "react";
+import React, { FC, useCallback, useEffect, useState, useRef } from "react";
 import styles from "../styles/FurnacePage.module.css";
 import { getContractFactory, convertToInt, getTokenList, Token, tokenMetadata } from "@/services/utils";
 import { burn } from "@/services/token.service";
@@ -42,6 +42,7 @@ export const FurnacePage: FC = () => {
   const [computedBalance, setComputedBalance] = useState<string>('0');
   const [isCustomToken, setIsCustomToken] = useState(false);
   const [txId, setTxId] = useState<string | undefined>(undefined);
+  const nodeRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -144,24 +145,27 @@ export const FurnacePage: FC = () => {
                   exit: styles.fadeExit,
                   exitActive: styles.fadeExitActive,
                 }}
+                nodeRef={nodeRef}
               >
-                {txId ? (
-                  <BurnSummary 
-                  amount={amount}
-                  tokenSymbol={selectedToken?.symbol}
-                  txId={txId}
-                  logoURI={selectedToken?.logoURI}
-                />
-                ) : (
-                  <Image
-                    src="/burnmeme.webp"
-                    alt="Burn Meme"
-                    width={100}
-                    height={100}
-                    className={styles.burnImage}
-                    priority
-                  />
-                )}
+                <div ref={nodeRef}>
+                  {txId ? (
+                    <BurnSummary 
+                      amount={amount}
+                      tokenSymbol={selectedToken?.symbol}
+                      txId={txId}
+                      logoURI={selectedToken?.logoURI}
+                    />
+                  ) : (
+                    <Image
+                      src="/burnmeme.webp"
+                      alt="Burn Meme"
+                      width={100}
+                      height={100}
+                      className={styles.burnImage}
+                      priority
+                    />
+                  )}
+                </div>
               </CSSTransition>
             </SwitchTransition>
           </div>
@@ -183,13 +187,8 @@ export const FurnacePage: FC = () => {
                   }
                 }}
                 value={tokenSelect?.find(option => option.value === selectedToken?.symbol)}
-                styles={{
-                  control: (baseStyles) => ({
-                    ...baseStyles,
-                    width: '173px',
-                  }),
-                }}
               />
+
             </div>
             
             {isCustomToken && (
@@ -254,7 +253,7 @@ export const FurnacePage: FC = () => {
             </button>
           </div>
           
-          <div className={styles.checkboxContainer}>
+          <div className={styles.checkboxContainer} hidden >
             <label className={styles.checkboxLabel}>
               <input
                 disabled={isLoading || connectionStatus !== 'connected'}
