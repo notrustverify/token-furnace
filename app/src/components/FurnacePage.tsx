@@ -132,7 +132,7 @@ export const FurnacePage: FC = () => {
         const floatToDecimals = rawAmount ? [rawAmount, 0] : convertToInt(amount)
         console.log(floatToDecimals)
         console.log(rawAmount)
-        setRawAmount(undefined)
+
 
         const tx = await burn(
           signer,
@@ -144,6 +144,8 @@ export const FurnacePage: FC = () => {
           account?.group,
           rawAmount != undefined? true : false
         );
+        setRawAmount(undefined)
+
         setTxId(tx.txId)
         updateBalanceForTx(tx.txId, 1)
       } catch (error) {
