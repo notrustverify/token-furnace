@@ -14,16 +14,21 @@ export const burn = async (
   tokenIdToBurn: string,
   tokenDecimals: number,
   withNft: boolean,
-  groupIndex: number
+  groupIndex: number,
+  isMax?: boolean
 ): Promise<ExecuteScriptResult> => {
-  const decimalsPower = BigInt(tokenDecimals-decimalsAmount)
-  console.log(amount * 10n ** decimalsPower)
-  console.log(amount * 10n ** decimalsPower)
+  let decimalsPower = 0n
+
+  if(!isMax) {
+     decimalsPower = BigInt(tokenDecimals-decimalsAmount)
+    console.log("test "+amount * 10n ** decimalsPower)
+  }
+ console.log(decimalsPower)
 
   const contract = getContractFactory(groupIndex)
   return await contract.transact.burn({
     args: {
-      amountToBurn: amount * 10n ** decimalsPower,
+      amountToBurn: !isMax ? amount * 10n ** decimalsPower : amount,
       tokenIdToBurn: tokenIdToBurn,
       withNft: withNft
     },
@@ -31,9 +36,9 @@ export const burn = async (
     tokens: [
       {
         id: tokenIdToBurn,
-        amount: amount * 10n ** decimalsPower,
+        amount: !isMax ? amount * 10n ** decimalsPower : amount,
       },
     ],
-    attoAlphAmount: withNft ? MINIMAL_CONTRACT_DEPOSIT + 3n * DUST_AMOUNT : 3n * DUST_AMOUNT,
+    attoAlphAmount: withNft ? MINIMAL_CONTRACT_DEPOSIT + 2n * DUST_AMOUNT : 2n * DUST_AMOUNT,
   });
 }

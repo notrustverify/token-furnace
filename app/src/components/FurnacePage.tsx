@@ -46,6 +46,8 @@ export const FurnacePage: FC = () => {
   const [showSummary, setShowSummary] = useState(false);
   const nodeRef = useRef(null);
   const { theme } = useTheme();
+  const [rawAmount, setRawAmount] = useState<bigint | undefined>();
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -127,16 +129,20 @@ export const FurnacePage: FC = () => {
     if (signer) {
       try {
         
-        const floatToDecimals = convertToInt(amount)
+        const floatToDecimals = rawAmount ? [rawAmount, 0] : convertToInt(amount)
         console.log(floatToDecimals)
+        console.log(rawAmount)
+        setRawAmount(undefined)
+
         const tx = await burn(
           signer,
-          floatToDecimals[0],
-          floatToDecimals[1],
+          BigInt(floatToDecimals[0]),
+          Number(floatToDecimals[1]),
           selectedToken?.id ?? '',
           selectedToken?.decimals ?? 0,
           withNft,
-          account?.group
+          account?.group,
+          rawAmount != undefined? true : false
         );
         setTxId(tx.txId)
         updateBalanceForTx(tx.txId, 1)
@@ -153,6 +159,7 @@ export const FurnacePage: FC = () => {
         // Convert the raw balance to the correct decimal representation
         const balanceWithDecimals = (Number(tokenBalance.amount) / Math.pow(10, selectedToken.decimals));
         setAmount(balanceWithDecimals.toString());
+        setRawAmount(tokenBalance.amount)
       }
     }
   };
@@ -293,21 +300,21 @@ export const FurnacePage: FC = () => {
               disabled={isLoading || connectionStatus !== 'connected'}
               type="number"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={(e) => {setAmount(e.target.value); setRawAmount(undefined)}}
               className={styles.amountInput}
             />
           </div>
 
           <div>
             <button
-              onClick={() => setAmount((Number(computedBalance) * 0.1).toString())}
+              onClick={() => {setAmount((Number(computedBalance) * 0.1).toString()); setRawAmount(undefined)}}
               disabled={isLoading || connectionStatus !== 'connected'}
               className={styles.percentageButton}
             >
               10%
             </button>
             <button
-              onClick={() => setAmount((Number(computedBalance) * 0.5).toString())}
+              onClick={() => {setAmount((Number(computedBalance) * 0.5).toString()); setRawAmount(undefined)}}
               disabled={isLoading || connectionStatus !== 'connected'}
               className={styles.percentageButton}
             >
