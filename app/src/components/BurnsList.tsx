@@ -23,6 +23,13 @@ interface BurnerStats {
   uniqueTokens: Set<string>;
 }
 
+interface TokenBurnStats {
+  tokenId: string;
+  symbol?: string;
+  logoURI?: string;
+  burnCount: number;
+}
+
 const formatAmount = (amount: string, decimals: number): string => {
   const num = Number(amount) / Math.pow(10, decimals);
   if (num >= 1e9) return (num / 1e9).toFixed(1) + 'B';
@@ -42,6 +49,10 @@ const formatDate = (timestamp: number): string => {
   });
 };
 
+const formatAddress = (address: string): string => {
+  return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+};
+
 export const BurnsList: React.FC = () => {
   const [burns, setBurns] = useState<BurnEvent[]>([]);
   const [tokenList, setTokenList] = useState<Token[]>([]);
@@ -49,6 +60,7 @@ export const BurnsList: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [totalBurns, setTotalBurns] = useState<number>(0);
   const [topBurners, setTopBurners] = useState<BurnerStats[]>([]);
+  const [topTokens, setTopTokens] = useState<TokenBurnStats[]>([]);
 
   web3.setCurrentNodeProvider(
     (process.env.NEXT_PUBLIC_NODE_URL as string) ??
@@ -95,6 +107,7 @@ export const BurnsList: React.FC = () => {
 
             setBurns(prevBurns => [newBurn, ...prevBurns]);
             updateTopBurners(newBurn);
+            updateTopTokens(newBurn);
             return Promise.resolve();
           },
           errorCallback: (
@@ -179,69 +192,134 @@ export const BurnsList: React.FC = () => {
     });
   };
 
+  const updateTopTokens = (newBurn: BurnEvent) => {
+    setTopTokens(prevTokens => {
+      const tokenMap = new Map<string, TokenBurnStats>();
+      
+      prevTokens.forEach(token => {
+        tokenMap.set(token.tokenId, token);
+      });
+      
+      // Look up the token metadata using the tokenList
+      const tokenMetadata = tokenList.find(token => token.id === newBurn.tokenId);
+      
+      const existingToken = tokenMap.get(newBurn.tokenId) || {
+        tokenId: newBurn.tokenId,
+        symbol: tokenMetadata?.symbol, // Get symbol from metadata
+        burnCount: 0
+      };
+      
+      existingToken.burnCount += 1;
+      
+      // Always update the symbol in case it was undefined before
+      if (tokenMetadata?.symbol) {
+        existingToken.symbol = tokenMetadata.symbol;
+      }
+      
+      tokenMap.set(newBurn.tokenId, existingToken);
+      
+      return Array.from(tokenMap.values())
+        .sort((a, b) => b.burnCount - a.burnCount)
+        .slice(0, 5);
+    });
+  };
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
     <div className={styles.container}>
-      <div className={styles.topBurners}>
+      <div className={styles.sidePanel}>
         <div className={styles.totalBurns}>
           Total Burns: {totalBurns}
         </div>
-        <h3>Top Burners</h3>
-        <div className={styles.topBurnersList}>
-          {topBurners.map((burner, index) => (
-            <div key={burner.address} className={styles.topBurnerItem}>
-              <span className={styles.rank}>#{index + 1}</span>
-              <span className={styles.address}>
-                {burner.address.substring(0, 6)}...
-                {burner.address.substring(burner.address.length - 4)}
-              </span>
-              <span className={styles.stats}>
-                {burner.totalBurns} burns ({burner.uniqueTokens.size} tokens)
-              </span>
-            </div>
-          ))}
+        <div className={styles.topBurners}>
+          <h3>Top Burners</h3>
+          <div className={styles.topBurnersList}>
+            {topBurners.map((burner, index) => (
+              <div key={burner.address} className={styles.topBurnerItem}>
+                <span className={styles.rank}>#{index + 1}</span>
+                <span className={styles.address}>
+                  {burner.address.substring(0, 6)}...
+                  {burner.address.substring(burner.address.length - 4)}
+                </span>
+                <span className={styles.stats}>
+                  {burner.totalBurns} burns ({burner.uniqueTokens.size} tokens)
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className={styles.topTokens}>
+          <h3>Most Burned Tokens</h3>
+          <div className={styles.topTokensList}>
+            {topTokens.map((token, index) => {
+              const tokenMetadata = tokenList.find(t => t.id === token.tokenId);
+              return (
+                <div key={token.tokenId} className={styles.topTokenItem}>
+                  <span className={styles.rank}>#{index + 1}</span>
+                  {tokenMetadata?.logoURI && (
+                    <Image
+                      src={tokenMetadata.logoURI}
+                      alt="token logo"
+                      width={24}
+                      height={24}
+                      className={styles.tokenLogo}
+                    />
+                  )}
+                  <span className={styles.tokenSymbol}>
+                    {tokenMetadata?.symbol || token.tokenId}
+                  </span>
+                  <span className={styles.stats}>
+                    {token.burnCount} burns
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
-      <div className={styles.list}>
-        {burns.map((burn) => (
-          <div key={burn.txId} className={styles.burnItem}>
-            <div className={styles.tokenInfo}>
-              {burn.logoURI && (
-                <Image
-                  src={burn.logoURI}
-                  alt={`${burn.tokenSymbol} logo`}
-                  width={24}
-                  height={24}
-                  className={styles.tokenLogo}
-                />
-              )}
-              <span>
-                {burn.tokenSymbol 
-                  ? truncateSymbol(burn.tokenSymbol) 
-                  : `${burn.tokenId.substring(0, 6)}...${burn.tokenId.substring(burn.tokenId.length - 4)}`
-                }
-              </span>
-            </div>
-            <div className={styles.burnDetails}>
-              <span>
-                {formatAmount(burn.amount, burn.decimals)} burned
-              </span>
-              <span>by {burn.burner.substring(0, 6)}...{burn.burner.substring(burn.burner.length - 4)}</span>
-              <small>Group {burn.group}</small>
-              <span>{formatDate(burn.timestamp)}</span>
-            </div>
-            <a
-              href={`https://explorer.alephium.org/transactions/${burn.txId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.txLink}
-            >
-              tx link
-            </a>
-          </div>
-        ))}
+      <div className={styles.mainContent}>
+        <div className={styles.list}>
+          {burns.map((burn) => {
+            const tokenMetadata = tokenList.find(token => token.id === burn.tokenId);
+            
+            return (
+              <div key={burn.txId} className={styles.burnItem}>
+                <div className={styles.tokenInfo}>
+                  {tokenMetadata?.logoURI && (
+                    <Image
+                      src={tokenMetadata.logoURI}
+                      alt="token logo"
+                      width={24}
+                      height={24}
+                      className={styles.tokenLogo}
+                    />
+                  )}
+                  <span>
+                    {tokenMetadata?.symbol || burn.tokenId}
+                  </span>
+                </div>
+                <div className={styles.burnDetails}>
+                  <span>
+                    {formatAmount(burn.amount, burn.decimals)} burned
+                  </span>
+                  <span>by {formatAddress(burn.burner)}</span>
+                  <small>Group {burn.group}</small>
+                  <span>{formatDate(burn.timestamp)}</span>
+                </div>
+                <a
+                  href={`https://explorer.alephium.org/transactions/${burn.txId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.txLink}
+                >
+                  tx link
+                </a>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
