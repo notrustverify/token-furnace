@@ -53,6 +53,10 @@ const formatAddress = (address: string): string => {
   return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
 };
 
+const truncateTokenId = (tokenId: string): string => {
+  return `${tokenId.substring(0, 6)}...`;
+};
+
 export const BurnsList: React.FC = () => {
   const [burns, setBurns] = useState<BurnEvent[]>([]);
   const [tokenList, setTokenList] = useState<Token[]>([]);
@@ -268,7 +272,7 @@ export const BurnsList: React.FC = () => {
                     />
                   )}
                   <span className={styles.tokenSymbol}>
-                    {tokenMetadata?.symbol || token.tokenId}
+                    {tokenMetadata?.symbol || truncateTokenId(token.tokenId)}
                   </span>
                   <span className={styles.stats}>
                     {token.burnCount} burns
@@ -297,7 +301,7 @@ export const BurnsList: React.FC = () => {
                     />
                   )}
                   <span>
-                    {tokenMetadata?.symbol || burn.tokenId}
+                    {tokenMetadata?.symbol || truncateTokenId(burn.tokenId)}
                   </span>
                 </div>
                 <div className={styles.burnDetails}>
