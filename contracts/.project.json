@@ -1,5 +1,5 @@
 {
-  "fullNodeVersion": "v3.8.8",
+  "fullNodeVersion": "v3.10.0",
   "compilerOptionsUsed": {
     "ignoreUnusedConstantsWarnings": false,
     "ignoreUnusedVariablesWarnings": false,
@@ -31,9 +31,9 @@
     },
     "TokenFurnace": {
       "sourceFile": "token.ral",
-      "sourceCodeHash": "5e03f93f3dcb4b095665834e08fd4084832329c0edc518b5cac33fb3b8eb7c8a",
+      "sourceCodeHash": "7dece102f101d269ba1b8eb1518ced46ce202c88ce4cffc7b57f3130b51e271d",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "50ccbe01cffce5726f4970af1bd140ad734c437e114593f7ef66b28bc13fedac"
+      "codeHashDebug": "11bcc1d38a1102dd3248456682ae5b953fa88d7e3cd984efea3cddf84fe0b45a"
     }
   }
 }

@@ -248,7 +248,7 @@ export const TokenFurnace = new Factory(
   Contract.fromJson(
     TokenFurnaceContractJson,
     "",
-    "50ccbe01cffce5726f4970af1bd140ad734c437e114593f7ef66b28bc13fedac",
+    "11bcc1d38a1102dd3248456682ae5b953fa88d7e3cd984efea3cddf84fe0b45a",
     []
   )
 );

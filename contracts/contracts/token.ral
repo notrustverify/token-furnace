@@ -22,7 +22,7 @@ Contract TokenFurnace(
       assert!(tokenIdToBurn != ALPH , ErrorCodes.TokenIdNotAccepted)
       assert!(amountToBurn > 0, ErrorCodes.CannotBurnZero)
       
-      if(withNft && false){
+      if(withNft){
        let _ =  mint{caller -> ALPH: minimalContractDeposit!()}(tokenIdToBurn, amountToBurn, caller)
       }
 
