@@ -4,14 +4,20 @@ import { createContext, useContext, useState, useEffect } from 'react';
 const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('theme') || 'dark';
-    }
-    return 'dark';
-  });
+  const [theme, setTheme] = useState('dark');
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+    const stored = localStorage.getItem('theme');
+    if (stored) {
+      setTheme(stored);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isClient) return;
+
     const root = document.documentElement;
     root.classList.remove('light', 'dark');
     root.classList.add(theme);
@@ -25,13 +31,11 @@ export function ThemeProvider({ children }) {
     }
 
     localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
-  };
+  }, [theme, isClient]);
 
   useEffect(() => {
+    if (!isClient) return;
+
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     
     const handleChange = (e) => {
@@ -44,7 +48,11 @@ export function ThemeProvider({ children }) {
     mediaQuery.addEventListener('change', handleChange);
     
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
+  }, [isClient]);
+
+  const toggleTheme = () => {
+    setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
+  };
 
   const value = {
     theme,

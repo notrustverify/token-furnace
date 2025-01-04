@@ -105,16 +105,22 @@ export const translations = {
 };
 
 export function LanguageProvider({ children }) {
-  const [currentLanguage, setCurrentLanguage] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('preferredLanguage') || 'en';
-    }
-    return 'en';
-  });
+  const [currentLanguage, setCurrentLanguage] = useState('en');
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('preferredLanguage', currentLanguage);
-  }, [currentLanguage]);
+    setIsClient(true);
+    const stored = localStorage.getItem('preferredLanguage');
+    if (stored) {
+      setCurrentLanguage(stored);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isClient) {
+      localStorage.setItem('preferredLanguage', currentLanguage);
+    }
+  }, [currentLanguage, isClient]);
 
   const value = {
     currentLanguage,
