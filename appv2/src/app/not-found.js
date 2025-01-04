@@ -10,7 +10,6 @@ export default function Custom404() {
     useEffect(() => {
         document.body.className = '';
         document.body.classList.add(theme);
-        document.body.classList.add("font-urbanist");
     }, [theme]);
 
     return (

@@ -9,6 +9,7 @@ import { getContractFactory, convertToInt, getTokenList } from "./services/utils
 import { burn } from "./services/token.service";
 import { useBalance } from "@alephium/web3-react";
 import Image from 'next/image';
+import { web3 } from '@alephium/web3';
 
 function BurnInterface() {
   const { theme, isDark } = useTheme();
@@ -27,7 +28,7 @@ function BurnInterface() {
   useEffect(() => {
     document.body.className = '';
     document.body.classList.add(theme);
-    document.body.classList.add("font-urbanist");
+    web3.setCurrentNodeProvider(process.env.NEXT_PUBLIC_NODE_URL ?? "https://node.alphaga.app");
   }, [theme]);
 
   useEffect(() => {
