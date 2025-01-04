@@ -220,6 +220,7 @@ function BurnHistory() {
       }
     }
     subscribeEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenList]);
 
   // Total burns fetch with logging
