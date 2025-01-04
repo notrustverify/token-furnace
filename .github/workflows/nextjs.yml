@@ -78,10 +78,11 @@ jobs:
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
       - name: Set Secrets and Change Dir
         run: | # Secrets needed on the server
+          cd appv2
           echo "NEXT_PUBLIC_NODE_URL=${{vars.NEXT_PUBLIC_NODE_URL}}" >> .env
           echo "NEXT_PUBLIC_NETWORK=${{vars.NEXT_PUBLIC_NETWORK}}" >> .env
       - name: Build with Next.js
-        run: ${{ steps.detect-package-manager.outputs.runner }} run build
+        run: ${{ steps.detect-package-manager.outputs.runner }} build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
