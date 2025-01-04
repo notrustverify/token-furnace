@@ -78,14 +78,14 @@ jobs:
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
       - name: Set Secrets and Change Dir
         run: | # Secrets needed on the server
-          echo "NEXT_PUBLIC_NODE_URL=${{vars.NEXT_PUBLIC_NODE_URL}}" >> ./appv2/.env
-          echo "NEXT_PUBLIC_NETWORK=${{vars.NEXT_PUBLIC_NETWORK}}" >> ./appv2/.env
+          echo "NEXT_PUBLIC_NODE_URL=${{vars.NEXT_PUBLIC_NODE_URL}}" >> .env
+          echo "NEXT_PUBLIC_NETWORK=${{vars.NEXT_PUBLIC_NETWORK}}" >> .env
       - name: Build with Next.js
         run: ${{ steps.detect-package-manager.outputs.runner }} workspace my-contracts build && ${{ steps.detect-package-manager.outputs.runner }} workspace my-dapp build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./appv2/out
+          path: out
 
   # Deployment job
   deploy:
