@@ -81,7 +81,7 @@ jobs:
           echo "NEXT_PUBLIC_NODE_URL=${{vars.NEXT_PUBLIC_NODE_URL}}" >> .env
           echo "NEXT_PUBLIC_NETWORK=${{vars.NEXT_PUBLIC_NETWORK}}" >> .env
       - name: Build with Next.js
-        run: ${{ steps.detect-package-manager.outputs.runner }} workspace my-contracts build && ${{ steps.detect-package-manager.outputs.runner }} workspace my-dapp build
+        run: ${{ steps.detect-package-manager.outputs.runner }} run build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
