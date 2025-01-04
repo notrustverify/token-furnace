@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FaFire } from 'react-icons/fa';
 import { useWallet } from '@alephium/web3-react';
 import { useLanguage } from './context/LanguageContext';
@@ -8,6 +8,7 @@ import { useTheme } from './context/ThemeContext';
 import { getContractFactory, convertToInt, getTokenList } from "./services/utils";
 import { burn } from "./services/token.service";
 import { useBalance } from "@alephium/web3-react";
+import Image from 'next/image';
 
 function BurnInterface() {
   const { theme, isDark } = useTheme();
@@ -21,6 +22,7 @@ function BurnInterface() {
   const [isLoading, setIsLoading] = useState(true);
   const [rawAmount, setRawAmount] = useState();
   const [isCustomToken, setIsCustomToken] = useState(false);
+  const [burnSummary, setBurnSummary] = useState(null);
 
   useEffect(() => {
     document.body.classList.add(theme);
@@ -93,6 +95,11 @@ function BurnInterface() {
       
       setRawAmount(undefined);
       updateBalanceForTx(tx.txId, 1);
+      setBurnSummary({
+        amount: burnAmount,
+        symbol: selectedToken.symbol,
+        txId: tx.txId
+      });
     } catch (error) {
       console.error("Error during burn:", error);
     }
@@ -103,6 +110,10 @@ function BurnInterface() {
       isDark ? 'bg-gray-700' : 'bg-gray-200'
     } h-[42px] w-full`} />
   );
+
+  const formatAmount = (amount) => {
+    return Number(amount).toFixed(2);
+  };
 
   return (
     <div className={`min-h-screen flex flex-col relative transition-colors duration-200`}>
@@ -259,6 +270,51 @@ function BurnInterface() {
             </>
           )}
         </motion.div>
+
+        <AnimatePresence>
+          {burnSummary && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className={`mt-4 backdrop-blur-xl rounded-2xl p-6 border transition-colors duration-200 ${
+                isDark 
+                  ? 'bg-gray-800/50 text-white border-gray-700/50' 
+                  : 'bg-white/50 text-gray-900 border-gray-200/50'
+              }`}
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-red-400/10 rounded-lg flex items-center justify-center">
+                  {burnSummary.logoURI ? (
+                    <Image
+                      src={burnSummary.logoURI}
+                      alt="token logo"
+                      width={40}
+                      height={40}
+                      className="w-full h-full object-contain rounded-lg"
+                    />
+                  ) : (
+                    <FaFire className="text-red-400 w-6 h-6" />
+                  )}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg mb-1">Burn Summary</h3>
+                  <p className="text-sm opacity-90">
+                    You burned {formatAmount(burnSummary.amount)} {burnSummary.symbol}
+                  </p>
+                  <a
+                    href={`https://explorer.alephium.org/transactions/${burnSummary.txId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:text-blue-600 text-sm mt-2 inline-block"
+                  >
+                    🔥 View transaction on explorer
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
     </div>
   );
