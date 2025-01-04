@@ -25,9 +25,10 @@ function BurnInterface() {
   const [burnSummary, setBurnSummary] = useState(null);
 
   useEffect(() => {
+    document.body.className = '';
     document.body.classList.add(theme);
-    document.body.classList.add("font-urbanist",);
-  }, []);
+    document.body.classList.add("font-urbanist");
+  }, [theme]);
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -116,7 +117,7 @@ function BurnInterface() {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col relative transition-colors duration-200`}>
+    <div className="min-h-screen flex flex-col relative">
       <main className="flex-grow container mx-auto px-4 py-8 max-w-2xl mt-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

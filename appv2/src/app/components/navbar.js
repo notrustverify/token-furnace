@@ -20,17 +20,21 @@ export default function Navbar() {
   const isMobile = useMediaQuery({ maxWidth: 768 });
   const { currentLanguage, setCurrentLanguage, t } = useLanguage();
   const { theme, toggleTheme } = useTheme();
+  const isDark = theme === 'dark';
 
   if (isMobile) {
     return (
       <>
-        <motion.div className="fixed bottom-0 left-0 right-0 h-16 bg-gray-800/90 backdrop-blur-xl border-t border-gray-700/50 z-[99]">
+        <motion.div className={`fixed bottom-0 left-0 right-0 h-16 backdrop-blur-xl border-t z-[99] transition-colors duration-200 ${
+          isDark 
+            ? 'bg-gray-800/90 border-gray-700/50' 
+            : 'bg-white/90 border-gray-200/50'
+        }`}>
           <div className="flex justify-around items-center h-full px-6">
             <NavLink href="/" icon={<Coins size={24} />} text={t('burn')} isMobile={true} />
             <NavLink href="/burn" icon={<BookOpen size={24} />} text={t('history')} isMobile={true} />
           </div>
         </motion.div>
-        <MobileMenu />
         <div className="fixed top-6 right-6 z-[97]">
           <AlephiumConnectButton />
         </div>
@@ -48,25 +52,29 @@ export default function Navbar() {
         initial={{ width: isCollapsed ? '5rem' : '16rem' }}
         animate={{ width: isCollapsed ? '5rem' : '16rem' }}
         transition={{ duration: 0.3 }}
-        className={`fixed left-0 top-0 h-full ${
-          theme === 'dark'
+        className={`fixed left-0 top-0 h-full backdrop-blur-xl border-r transition-colors duration-200 ${
+          isDark
             ? 'bg-gray-800/50 border-gray-700/50'
             : 'bg-white/50 border-gray-200/50'
-        } backdrop-blur-xl border-r`}
+        }`}
       >
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -right-3 top-8 p-1.5 bg-gray-800 border border-gray-700 rounded-full text-gray-400 hover:text-white"
+          className={`absolute -right-3 top-8 p-1.5 rounded-full transition-colors duration-200 ${
+            isDark 
+              ? 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white' 
+              : 'bg-white border-gray-200 text-gray-600 hover:text-gray-900'
+          } border`}
         >
           {isCollapsed ? <FaChevronRight size={14} /> : <FaChevronLeft size={14} />}
         </motion.button>
 
         <div className="p-6">
           <Link href="/" className="flex items-center justify-center">
-            <span className={`${isCollapsed ? 'text-sm' : 'text-xl'} font-bold ${
-              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            <span className={`${isCollapsed ? 'text-sm' : 'text-xl'} font-bold transition-colors duration-200 ${
+              isDark ? 'text-white' : 'text-gray-900'
             }`}>
               {isCollapsed ? 'TF' : 'Token Furnace'}
             </span>
@@ -80,13 +88,19 @@ export default function Navbar() {
           </nav>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700/50">
+        <div className={`absolute bottom-0 left-0 right-0 p-4 border-t transition-colors duration-200 ${
+          isDark ? 'border-gray-700/50' : 'border-gray-200/50'
+        }`}>
           {!isCollapsed ? (
             <>
               <div className="flex justify-center items-center gap-2 mb-3">
                 <button
                   onClick={() => setCurrentLanguage(currentLanguage === 'en' ? 'fr' : 'en')}
-                  className="flex items-center space-x-2 px-2 py-1 rounded-lg hover:bg-gray-700/50 transition-colors"
+                  className={`flex items-center space-x-2 px-2 py-1 rounded-lg transition-colors duration-200 ${
+                    isDark 
+                      ? 'hover:bg-gray-700/50' 
+                      : 'hover:bg-gray-200/50'
+                  }`}
                 >
                   <Image
                     src={`/images/flags/${currentLanguage === 'en' ? 'en' : 'fr'}.png`}
@@ -95,31 +109,33 @@ export default function Navbar() {
                     height={20}
                     className="rounded-sm"
                   />
-                  <span className="text-sm text-gray-400">
+                  <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                     {currentLanguage === 'en' ? 'English' : 'Français'}
                   </span>
                 </button>
                 <button
                   onClick={toggleTheme}
-                  className={`p-2 rounded-lg transition-colors ${
-                    theme === 'dark'
+                  className={`p-2 rounded-lg transition-colors duration-200 ${
+                    isDark
                       ? 'hover:bg-gray-700/50 text-gray-400 hover:text-white'
                       : 'hover:bg-gray-200/50 text-gray-600 hover:text-gray-900'
                   }`}
                 >
-                  {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                  {isDark ? <Sun size={20} /> : <Moon size={20} />}
                 </button>
               </div>
               <div className="flex justify-center gap-6">
-                <SocialLink href="https://x.com/notrustverif" icon={<FaTwitter size={16} />} className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} />
-                <SocialLink href="https://github.com/notrustverify/token-furnace" icon={<FaGithub size={16} />} className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} />
+                <SocialLink href="https://x.com/notrustverif" icon={<FaTwitter size={16} />} />
+                <SocialLink href="https://github.com/notrustverify/token-furnace" icon={<FaGithub size={16} />} />
               </div>
             </>
           ) : (
             <div className="flex flex-col items-center space-y-3">
               <button
                 onClick={() => setCurrentLanguage(currentLanguage === 'en' ? 'fr' : 'en')}
-                className="p-2 rounded-lg hover:bg-gray-700/50 transition-colors"
+                className={`p-2 rounded-lg transition-colors duration-200 ${
+                  isDark ? 'hover:bg-gray-700/50' : 'hover:bg-gray-200/50'
+                }`}
               >
                 <Image
                   src={`/images/flags/${currentLanguage === 'en' ? 'en' : 'fr'}.png`}
@@ -129,8 +145,8 @@ export default function Navbar() {
                   className="rounded-sm"
                 />
               </button>
-              <SocialLink href="https://x.com/notrustverif" icon={<FaTwitter size={16} />} className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} />
-              <SocialLink href="https://github.com/notrustverify/token-furnace" icon={<FaGithub size={16} />} className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} />
+              <SocialLink href="https://x.com/notrustverif" icon={<FaTwitter size={16} />} />
+              <SocialLink href="https://github.com/notrustverify/token-furnace" icon={<FaGithub size={16} />} />
             </div>
           )}
         </div>
@@ -142,6 +158,7 @@ export default function Navbar() {
 function NavLink({ href, icon, text, isCollapsed, soon = false, isMobile = false, onClick }) {
   const pathname = usePathname();
   const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   if (isMobile) {
     return (
@@ -209,15 +226,18 @@ function NavLink({ href, icon, text, isCollapsed, soon = false, isMobile = false
   );
 }
 
-function SocialLink({ href, icon, className }) {
+function SocialLink({ href, icon }) {
   const { theme } = useTheme();
-
+  const isDark = theme === 'dark';
+  
   return (
     <motion.a
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.9 }}
       href={href}
-      className={className}
+      className={`transition-colors duration-200 ${
+        isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+      }`}
       target="_blank"
       rel="noopener noreferrer"
     >

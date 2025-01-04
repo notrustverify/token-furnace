@@ -39,11 +39,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" dir="LTR">
-      <body className={`${urbanist.variable}`}>
-        <ThemeProvider>
-          <AlephiumWalletProvider theme="midnight" network={"mainnet"} addressGroup={0}>
-            <LanguageProvider>
+    <html lang="en" className={`${urbanist.variable}`}>
+
+      <ThemeProvider>
+        <LanguageProvider>
+          <body className={`min-h-screen transition-colors duration-200 dark:bg-gray-900 bg-gray-50 font-urbanist ${urbanist.className}`}>
+            <AlephiumWalletProvider theme="midnight" network={"mainnet"} addressGroup={0}>
               <div className="flex min-h-screen">
                 <Navbar />
                 <main className="flex-1 overflow-x-hidden overflow-y-auto md:ml-56 lg:ml-64 xl:ml-72 pb-16 md:pb-0 px-4 md:px-8">
@@ -52,10 +53,10 @@ export default function RootLayout({ children }) {
                   </div>
                 </main>
               </div>
-            </LanguageProvider>
-          </AlephiumWalletProvider>
-        </ThemeProvider>
-      </body>
+            </AlephiumWalletProvider>
+          </body>
+        </LanguageProvider>
+      </ThemeProvider>
     </html>
   );
 }

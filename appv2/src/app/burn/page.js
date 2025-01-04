@@ -150,9 +150,10 @@ function BurnHistory() {
   const [topTokens, setTopTokens] = useState([]);
 
   useEffect(() => {
+    document.body.className = '';
     document.body.classList.add(theme);
-    document.body.classList.add("font-urbanist",);
-  }, []);
+    document.body.classList.add("font-urbanist");
+  }, [theme]);
 
   useEffect(() => {
     console.log('Setting up node provider...');
@@ -314,7 +315,7 @@ function BurnHistory() {
 
   if (isLoading) {
     return (
-      <div className={`min-h-screen flex flex-col relative`}>
+      <div className="min-h-screen flex flex-col relative">
         <main className="flex-grow container mx-auto px-4 py-8 max-w-7xl mt-16">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
@@ -363,10 +364,14 @@ function BurnHistory() {
     );
   }
 
-  if (error) return <div>Error: {error}</div>;
+  if (error) return (
+    <div className="min-h-screen flex flex-col relative">
+      Error: {error}
+    </div>
+  );
 
   return (
-    <div className={`min-h-screen flex flex-col relative`}>
+    <div className="min-h-screen flex flex-col relative">
       <main className="flex-grow container mx-auto px-4 py-8 max-w-7xl mt-16">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
