@@ -79,7 +79,7 @@ export const translations = {
     mostBurnedTokens: "Tokens les plus brûlés",
     tokens: "tokens",
     burns: "burns",
-    connectWalletToBurn: "Connectez votre wallet pour brûler des tokens",
+    connectWalletMessage: "Connectez votre wallet pour brûler des tokens",
 
     // Burn History Page
     burnHistory: "Historique des Burns",
