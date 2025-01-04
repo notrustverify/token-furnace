@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,1,0';
+
+:root {
+  --background: 255, 255, 255;
+  --text: 23, 23, 23;
+  --card-bg: 255, 255, 255;
+  --card-border: 229, 231, 235;
+  --hover-bg: 243, 244, 246;
+}
+
+.dark {
+  --background: 15, 23, 42;
+  --text: 255, 255, 255;
+  --card-bg: 31, 41, 55;
+  --card-border: 55, 65, 81;
+  --hover-bg: 55, 65, 81;
+}
+
+body {
+  background-color: rgb(var(--background));
+  color: rgb(var(--text));
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html {
+  font-family: var(--font-urbanist)!important ;
+}
+
+.theme-transition {
+  transition: background-color 0.3s ease,
+              border-color 0.3s ease,
+              color 0.3s ease;
+}
