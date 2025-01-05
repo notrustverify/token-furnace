@@ -1,7 +1,7 @@
 import { Deployer, DeployFunction, Network } from '@alephium/cli'
 import { Settings } from '../alephium.config'
 import { TokenFurnace, BurnerNFT } from '../artifacts/ts'
-import { hexToString, stringToHex } from '@alephium/web3'
+import { hexToString, NULL_CONTRACT_ADDRESS, stringToHex } from '@alephium/web3'
 import { expectAssertionError, mintToken } from '@alephium/web3-test'
 
 // This deploy function will be called by cli deployment tool automatically
@@ -20,7 +20,8 @@ const deployFaucet: DeployFunction<Settings> = async (
       collectionId: '',
       nftIndex: 0n,
       tokenIdBurned: '',
-      amountBurned: 0n
+      amountBurned: 0n,
+      burnedBy: NULL_CONTRACT_ADDRESS
     }
   })
 
@@ -33,8 +34,8 @@ const deployFaucet: DeployFunction<Settings> = async (
     // The initial states of the faucet contract
     initialFields: {
       nftTemplateId: nftTemplateResult.contractInstance.contractId,
-      collectionUri: stringToHex("https://arweave.net/Z1HAdT_PGnxPLct4-u7l1Zl_h4DNdxzKev7tCDAEflc"),
-      totalSupply: 0n
+      totalSupply: 0n,
+      collectionImageUri: stringToHex('https://arweave.net/hoxK8xC9wRjD_6HiOzhdY2jW0ZnJoF2f0N4FcSLXqzQ')
     }
   })
 

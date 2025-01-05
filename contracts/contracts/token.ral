@@ -1,7 +1,7 @@
 import "std/nft_collection_interface"
 Contract TokenFurnace(
     nftTemplateId: ByteVec,
-    collectionUri: ByteVec,
+    collectionImageUri: ByteVec,
     mut totalSupply: U256
   ) implements INFTCollection {
 
@@ -34,7 +34,7 @@ Contract TokenFurnace(
    @using(preapprovedAssets = true, updateFields = true)
    fn mint(tokenIdBurned: ByteVec, amountBurned: U256, burnerCaller: Address) -> (ByteVec) {
 
-     let (initialImmState, initialMutState) = BurnerNFT.encodeFields!(selfContractId!(), totalSupply, tokenIdBurned, amountBurned)
+     let (initialImmState, initialMutState) = BurnerNFT.encodeFields!(selfContractId!(), totalSupply, tokenIdBurned, amountBurned, convert(toByteVec!(burnerCaller)))
  
      let contractId = copyCreateSubContractWithToken!{burnerCaller -> ALPH: minimalContractDeposit!()}(
          toByteVec!(totalSupply),
@@ -50,7 +50,7 @@ Contract TokenFurnace(
    }
 
     pub fn getCollectionUri() -> ByteVec {
-        return collectionUri
+        return b`data:application/json,{"name": "Token Burner Proof - Group `++ u256ToString!(groupOfAddress!(selfAddress!()))++ b`", "description": "Prove your tokens burn.","image": "` ++ collectionImageUri ++ b`"}`
     }
     
     pub fn totalSupply() -> U256 {
