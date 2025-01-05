@@ -2,11 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   output: "export",
-  images: {
-    domains: [
-      'raw.githubusercontent.com',
-    ],
-  },
+  images: { unoptimized: true },
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback.fs = false

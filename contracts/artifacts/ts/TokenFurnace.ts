@@ -87,6 +87,10 @@ export namespace TokenFurnaceTypes {
       }>;
       result: CallContractResult<HexString>;
     };
+    convert: {
+      params: CallContractParams<{ array: HexString }>;
+      result: CallContractResult<HexString>;
+    };
   }
   export type CallMethodParams<T extends keyof CallMethodTable> =
     CallMethodTable[T]["params"];
@@ -138,6 +142,10 @@ export namespace TokenFurnaceTypes {
         amountBurned: bigint;
         burnerCaller: Address;
       }>;
+      result: SignExecuteScriptTxResult;
+    };
+    convert: {
+      params: SignExecuteContractMethodParams<{ array: HexString }>;
       result: SignExecuteScriptTxResult;
     };
   }
@@ -232,6 +240,14 @@ class Factory extends ContractFactory<
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "mint", params, getContractByCodeHash);
     },
+    convert: async (
+      params: TestContractParamsWithoutMaps<
+        TokenFurnaceTypes.Fields,
+        { array: HexString }
+      >
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
+      return testMethod(this, "convert", params, getContractByCodeHash);
+    },
   };
 
   stateForTest(
@@ -248,7 +264,7 @@ export const TokenFurnace = new Factory(
   Contract.fromJson(
     TokenFurnaceContractJson,
     "",
-    "11bcc1d38a1102dd3248456682ae5b953fa88d7e3cd984efea3cddf84fe0b45a",
+    "d0e8cba96b5dfdb2fd41df2553d98529bacd65e3ec91d424aea8e07292c2b3e3",
     []
   )
 );
@@ -348,6 +364,17 @@ export class TokenFurnaceInstance extends ContractInstance {
         getContractByCodeHash
       );
     },
+    convert: async (
+      params: TokenFurnaceTypes.CallMethodParams<"convert">
+    ): Promise<TokenFurnaceTypes.CallMethodResult<"convert">> => {
+      return callMethod(
+        TokenFurnace,
+        this,
+        "convert",
+        params,
+        getContractByCodeHash
+      );
+    },
   };
 
   transact = {
@@ -382,6 +409,11 @@ export class TokenFurnaceInstance extends ContractInstance {
       params: TokenFurnaceTypes.SignExecuteMethodParams<"mint">
     ): Promise<TokenFurnaceTypes.SignExecuteMethodResult<"mint">> => {
       return signExecuteMethod(TokenFurnace, this, "mint", params);
+    },
+    convert: async (
+      params: TokenFurnaceTypes.SignExecuteMethodParams<"convert">
+    ): Promise<TokenFurnaceTypes.SignExecuteMethodResult<"convert">> => {
+      return signExecuteMethod(TokenFurnace, this, "convert", params);
     },
   };
 
