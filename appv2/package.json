@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "CI= next build -d",
+    "build": "NODE_OPTIONS='--trace-deprecation'  CI=1 next build -d",
     "start": "next start",
     "lint": "next lint"
   },

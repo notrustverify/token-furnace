@@ -85,7 +85,11 @@ jobs:
         run: |
           export NODE_OPTIONS="--trace-deprecation"
           ${{ steps.detect-package-manager.outputs.runner }} build
-        shell: /usr/bin/bash -ex {0}
+      - name: Debug build output
+        run: |
+            ls -l
+            ls -l .next || echo "No .next directory found"
+            ls -l out || echo "No out directory found"
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
