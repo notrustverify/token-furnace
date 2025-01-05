@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "NODE_OPTIONS='--trace-deprecation'  CI=1 next build -d",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -49,6 +49,7 @@
     "ts-jest": "^29.1.4"
   },
   "devDependencies": {
-    "@types/react": "19.0.1"
+    "@types/react": "19.0.1",
+    "typescript": "5.7.2"
   }
 }

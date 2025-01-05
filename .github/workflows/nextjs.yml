@@ -34,9 +34,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: update yarn
-        run: |
-           npm install yarn@latest -g
       - name: Detect package manager
         id: detect-package-manager
         run: |
@@ -57,7 +54,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "20"
           cache: ${{ steps.detect-package-manager.outputs.manager }}
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -79,23 +76,13 @@ jobs:
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
-      - name: Debug build output
-        run: |
-            more .env
       - name: Set Secrets and Change Dir
-        env:
-          NEXT_PUBLIC_NODE_URL: ${{ vars.NEXT_PUBLIC_NODE_URL }}
-          NEXT_PUBLIC_NETWORK: ${{ vars.NEXT_PUBLIC_NETWORK }}
-        run: echo "Secrets set"
+        run: | # Secrets needed on the server
+          echo "NEXT_PUBLIC_NODE_URL=${{vars.NEXT_PUBLIC_NODE_URL}}" >> .env
+          echo "NEXT_PUBLIC_NETWORK=${{vars.NEXT_PUBLIC_NETWORK}}" >> .env
       - name: Build with Next.js
         run: |
-          export NODE_OPTIONS="--trace-deprecation"
           ${{ steps.detect-package-manager.outputs.runner }} build
-      - name: Debug build output
-        run: |
-            ls -l
-            ls -l .next || echo "No .next directory found"
-            ls -l out || echo "No out directory found"
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
