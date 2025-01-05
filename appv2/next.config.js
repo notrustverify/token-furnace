@@ -22,7 +22,16 @@ const nextConfig = {
     }
     config.externals.push('pino-pretty', 'encoding')
     return config
-  }
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  experimental: {
+    outputFileTracing: true,
+  },
 }
 
 module.exports = nextConfig

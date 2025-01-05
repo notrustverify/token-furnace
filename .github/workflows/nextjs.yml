@@ -83,6 +83,7 @@ jobs:
         run: echo "Secrets set"
       - name: Build with Next.js
         run: |
+          export NODE_OPTIONS="--trace-deprecation"
           ${{ steps.detect-package-manager.outputs.runner }} build
         shell: /usr/bin/bash -ex {0}
       - name: Upload artifact
