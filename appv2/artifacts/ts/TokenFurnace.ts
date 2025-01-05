@@ -40,7 +40,7 @@ import { getContractByCodeHash, registerContract } from "./contracts";
 export namespace TokenFurnaceTypes {
   export type Fields = {
     nftTemplateId: HexString;
-    collectionUri: HexString;
+    collectionImageUri: HexString;
     totalSupply: bigint;
   };
 
@@ -264,7 +264,7 @@ export const TokenFurnace = new Factory(
   Contract.fromJson(
     TokenFurnaceContractJson,
     "",
-    "d0e8cba96b5dfdb2fd41df2553d98529bacd65e3ec91d424aea8e07292c2b3e3",
+    "b1fc1809498587ee52f79c339c41533972a701865f38a1e9e05ab1dcf31b64e2",
     []
   )
 );
