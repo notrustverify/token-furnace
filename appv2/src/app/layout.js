@@ -1,10 +1,18 @@
 import './globals.css';
 import "./assets/css/materialdesignicons.min.css";
 import "./assets/css/tailwind.css";
+import { Urbanist } from 'next/font/google'
 import { AlephiumWalletProvider } from '@alephium/web3-react';
 import Navbar from './components/navbar';
 import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
+
+const urbanist = Urbanist({
+  subsets: ['latin'],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  display: "swap",
+  variable: "--font-urbanist",
+ })
 
 export const metadata = {
   title: 'Token Furnace',
@@ -31,11 +39,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${urbanist.variable}`}>
 
       <ThemeProvider>
         <LanguageProvider>
-          <body className={`min-h-screen transition-colors duration-200 dark:bg-gray-900 bg-gray-50`}>
+          <body className={`min-h-screen transition-colors duration-200 dark:bg-gray-900 bg-gray-50 font-urbanist ${urbanist.className}`}>
             <AlephiumWalletProvider theme="midnight" network={"mainnet"} addressGroup={0}>
               <div className="flex min-h-screen">
                 <Navbar />
