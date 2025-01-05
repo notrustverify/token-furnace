@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build -d",
+    "build": "CI= next build -d",
     "start": "next start",
     "lint": "next lint"
   },
