@@ -17,7 +17,8 @@ export const burn = async (
   groupIndex: number,
   isMax?: boolean
 ): Promise<ExecuteScriptResult> => {
-  const decimalsPower = BigInt(tokenDecimals - decimalsAmount)
+  let decimalsPower = 0n
+
 
   const contract = getContractFactory(groupIndex)
   return await contract.transact.burn({
