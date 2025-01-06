@@ -52,6 +52,7 @@ export const translations = {
     burnSuccess: "Successfully burned",
     burnError: "Error burning tokens",
     connectWalletToBurn: "Connect wallet to burn tokens",
+    receiveNFT: "Receive NFT for this burn",
   },
   fr: {
     // Navbar
@@ -101,6 +102,7 @@ export const translations = {
     burnSuccess: "Tokens brûlés avec succès",
     burnError: "Erreur lors de la destruction",
     connectWalletToBurn: "Connectez votre wallet pour brûler des tokens",
+    receiveNFT: "Recevoir un NFT pour ce burn",
   }
 };
 
