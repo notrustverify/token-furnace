@@ -53,6 +53,11 @@ export const translations = {
     burnError: "Error burning tokens",
     connectWalletToBurn: "Connect wallet to burn tokens",
     receiveNFT: "Receive NFT for this burn",
+    confirmBurnTitle: "Confirm Burn",
+    confirmBurnMessage: "Are you sure you want to burn",
+    confirmBurnAll: "Are you sure you want to burn all your",
+    cancel: "Cancel",
+    confirm: "Confirm",
   },
   fr: {
     // Navbar
@@ -103,6 +108,11 @@ export const translations = {
     burnError: "Erreur lors de la destruction",
     connectWalletToBurn: "Connectez votre wallet pour brûler des tokens",
     receiveNFT: "Recevoir un NFT pour ce burn",
+    confirmBurnTitle: "Confirmer le Burn",
+    confirmBurnMessage: "Êtes-vous sûr de vouloir brûler",
+    confirmBurnAll: "Êtes-vous sûr de vouloir brûler tous vos",
+    cancel: "Annuler",
+    confirm: "Confirmer",
   }
 };
 

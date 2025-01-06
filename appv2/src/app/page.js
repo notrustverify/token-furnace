@@ -10,6 +10,7 @@ import { burn } from "./services/token.service";
 import { useBalance } from "@alephium/web3-react";
 import Image from 'next/image';
 import { web3 } from '@alephium/web3';
+import ConfirmBurnModal from './components/ConfirmBurnModal';
 
 function BurnInterface() {
   const { theme, isDark } = useTheme();
@@ -25,6 +26,7 @@ function BurnInterface() {
   const [isCustomToken, setIsCustomToken] = useState(false);
   const [wantNFT, setWantNFT] = useState(false);
   const [burnSummary, setBurnSummary] = useState(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   useEffect(() => {
     document.body.className = '';
@@ -69,11 +71,12 @@ function BurnInterface() {
       if (percentage === 100) {
         const tokenBalance = balance.tokenBalances.find(token => token.id === selectedToken.id);
         if (tokenBalance) {
+          const balanceWithDecimals = (Number(tokenBalance.amount) / Math.pow(10, selectedToken.decimals));
+          setBurnAmount(balanceWithDecimals.toString());
           setRawAmount(tokenBalance.amount);
-          setBurnAmount(computedBalance);
         }
       } else {
-        const amount = (parseFloat(computedBalance) * percentage / 100).toFixed(selectedToken.decimals);
+        const amount = (Number(computedBalance) * (percentage/100)).toString();
         setBurnAmount(amount);
         setRawAmount(undefined);
       }
@@ -81,32 +84,47 @@ function BurnInterface() {
   };
 
   const handleBurn = async () => {
-    if (!selectedToken || !burnAmount) return;
-    
-    try {
-      const floatToDecimals = rawAmount ? [rawAmount, 0] : convertToInt(burnAmount);
-      console.log(floatToDecimals);
-      const tx = await burn(
-        signer,
-        BigInt(floatToDecimals[0]),
-        Number(floatToDecimals[1]),
-        selectedToken?.id ?? '',
-        selectedToken?.decimals ?? 0,
-        wantNFT,
-        account?.group,
-        rawAmount != undefined? true : false
-      );
-      
-      setRawAmount(undefined);
-      updateBalanceForTx(tx.txId, 1);
-      setBurnSummary({
-        amount: burnAmount,
-        symbol: selectedToken.symbol,
-        txId: tx.txId
-      });
-    } catch (error) {
-      console.error("Error during burn:", error);
+    if (!burnAmount) {
+      alert(t('enterAmount'));
+      return;
     }
+
+    if (burnAmount === computedBalance) {
+      setShowConfirmModal(true);
+    } else {
+      await handleConfirmBurn();
+    }
+  };
+
+  const handleConfirmBurn = async () => {
+    if (signer) {
+      try {
+        const cleanAmount = burnAmount.toString().replace(',', '.');
+        const floatToDecimals = rawAmount ? [rawAmount, 0] : convertToInt(cleanAmount);
+        
+        const tx = await burn(
+          signer,
+          BigInt(floatToDecimals[0]),
+          Number(floatToDecimals[1]),
+          selectedToken?.id ?? '',
+          selectedToken?.decimals ?? 0,
+          wantNFT,
+          account?.group,
+          rawAmount != undefined ? true : false
+        );
+        
+        setRawAmount(undefined);
+        updateBalanceForTx(tx.txId, 1);
+        setBurnSummary({
+          amount: burnAmount,
+          symbol: selectedToken.symbol,
+          txId: tx.txId
+        });
+      } catch (error) {
+        console.error("Error during burn:", error);
+      }
+    }
+    setShowConfirmModal(false);
   };
 
   const Skeleton = () => (
@@ -223,19 +241,21 @@ function BurnInterface() {
                     </div>
                   )}
 
-                  <div className="relative">
-                    <input
-                      type="number"
-                      value={burnAmount}
-                      onChange={(e) => setBurnAmount(e.target.value)}
-                      placeholder="0.00"
-                      className={`w-full p-3 rounded-lg transition-colors duration-200 ${
-                        isDark
-                          ? 'bg-gray-700 text-white border-gray-600'
-                          : 'bg-gray-50 text-gray-900 border-gray-200'
-                      } border focus:ring-2 focus:ring-orange-400 focus:border-transparent text-center`}
-                    />
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-2">
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <input
+                        type="number"
+                        value={burnAmount}
+                        onChange={(e) => {setBurnAmount(e.target.value); setRawAmount(undefined)}}
+                        placeholder="0.00"
+                        className={`w-full p-3 rounded-lg transition-colors duration-200 ${
+                          isDark
+                            ? 'bg-gray-700 text-white border-gray-600'
+                            : 'bg-gray-50 text-gray-900 border-gray-200'
+                        } border focus:ring-2 focus:ring-orange-400 focus:border-transparent text-center`}
+                      />
+                    </div>
+                    <div className="flex justify-end gap-2">
                       {[10, 50, 100].map((percentage) => (
                         <button
                           key={percentage}
@@ -342,6 +362,14 @@ function BurnInterface() {
           )}
         </AnimatePresence>
       </main>
+      <ConfirmBurnModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={handleConfirmBurn}
+        amount={burnAmount}
+        symbol={selectedToken?.symbol}
+        isMax={burnAmount === computedBalance}
+      />
     </div>
   );
 }

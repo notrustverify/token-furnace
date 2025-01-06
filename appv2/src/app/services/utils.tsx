@@ -27,16 +27,12 @@ export interface TokenFaucetConfig {
 
 
 export const convertToInt = (withdrawAmount: string): [bigint, number] => {
-  // Convert scientific notation to regular decimal
-  const normalizedNumber = Number(withdrawAmount).toLocaleString('fullwide', {
-    useGrouping: false,
-    maximumFractionDigits: 20
-  })
+  const normalizedNumber = withdrawAmount.toString()
+    .replace(',', '.')
+    .trim();
 
-  // Split the number into integer and decimal parts
   const [integerPart, decimalPart = ''] = normalizedNumber.split('.')
 
-  // Combine integer and decimal parts without the decimal point
   const fullNumber = integerPart + decimalPart
 
   return [
