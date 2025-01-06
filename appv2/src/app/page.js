@@ -9,6 +9,7 @@ import { getContractFactory, convertToInt, getTokenList } from "./services/utils
 import { burn } from "./services/token.service";
 import { useBalance } from "@alephium/web3-react";
 import Image from 'next/image';
+import { web3 } from '@alephium/web3';
 
 function BurnInterface() {
   const { theme, isDark } = useTheme();
@@ -22,12 +23,13 @@ function BurnInterface() {
   const [isLoading, setIsLoading] = useState(true);
   const [rawAmount, setRawAmount] = useState();
   const [isCustomToken, setIsCustomToken] = useState(false);
+  const [wantNFT, setWantNFT] = useState(false);
   const [burnSummary, setBurnSummary] = useState(null);
 
   useEffect(() => {
     document.body.className = '';
     document.body.classList.add(theme);
-    document.body.classList.add("font-urbanist");
+    web3.setCurrentNodeProvider(process.env.NEXT_PUBLIC_NODE_URL ?? "https://node.alphaga.app");
   }, [theme]);
 
   useEffect(() => {
@@ -89,7 +91,7 @@ function BurnInterface() {
         Number(floatToDecimals[1]),
         selectedToken?.id ?? '',
         selectedToken?.decimals ?? 0,
-        false,
+        wantNFT,
         account?.group,
         rawAmount != undefined? true : false
       );
@@ -247,6 +249,28 @@ function BurnInterface() {
                         </button>
                       ))}
                     </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="wantNFT"
+                      checked={wantNFT}
+                      onChange={(e) => setWantNFT(e.target.checked)}
+                      className={`w-4 h-4 rounded transition-colors duration-200 ${
+                        isDark
+                          ? 'bg-gray-700 border-gray-600'
+                          : 'bg-gray-50 border-gray-200'
+                      } border focus:ring-2 focus:ring-orange-400`}
+                    />
+                    <label
+                      htmlFor="wantNFT"
+                      className={`text-sm transition-colors duration-200 ${
+                        isDark ? 'text-gray-300' : 'text-gray-700'
+                      }`}
+                    >
+                      {t('receiveNFT') || 'Receive NFT for this burn'}
+                    </label>
                   </div>
 
                   <motion.button

@@ -152,7 +152,6 @@ function BurnHistory() {
   useEffect(() => {
     document.body.className = '';
     document.body.classList.add(theme);
-    document.body.classList.add("font-urbanist");
   }, [theme]);
 
   useEffect(() => {
