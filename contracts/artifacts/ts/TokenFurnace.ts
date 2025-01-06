@@ -40,7 +40,7 @@ import { getContractByCodeHash, registerContract } from "./contracts";
 export namespace TokenFurnaceTypes {
   export type Fields = {
     nftTemplateId: HexString;
-    collectionUri: HexString;
+    collectionImageUri: HexString;
     totalSupply: bigint;
   };
 
@@ -85,6 +85,10 @@ export namespace TokenFurnaceTypes {
         amountBurned: bigint;
         burnerCaller: Address;
       }>;
+      result: CallContractResult<HexString>;
+    };
+    convert: {
+      params: CallContractParams<{ array: HexString }>;
       result: CallContractResult<HexString>;
     };
   }
@@ -138,6 +142,10 @@ export namespace TokenFurnaceTypes {
         amountBurned: bigint;
         burnerCaller: Address;
       }>;
+      result: SignExecuteScriptTxResult;
+    };
+    convert: {
+      params: SignExecuteContractMethodParams<{ array: HexString }>;
       result: SignExecuteScriptTxResult;
     };
   }
@@ -232,6 +240,14 @@ class Factory extends ContractFactory<
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "mint", params, getContractByCodeHash);
     },
+    convert: async (
+      params: TestContractParamsWithoutMaps<
+        TokenFurnaceTypes.Fields,
+        { array: HexString }
+      >
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
+      return testMethod(this, "convert", params, getContractByCodeHash);
+    },
   };
 
   stateForTest(
@@ -248,7 +264,7 @@ export const TokenFurnace = new Factory(
   Contract.fromJson(
     TokenFurnaceContractJson,
     "",
-    "50ccbe01cffce5726f4970af1bd140ad734c437e114593f7ef66b28bc13fedac",
+    "b1fc1809498587ee52f79c339c41533972a701865f38a1e9e05ab1dcf31b64e2",
     []
   )
 );
@@ -348,6 +364,17 @@ export class TokenFurnaceInstance extends ContractInstance {
         getContractByCodeHash
       );
     },
+    convert: async (
+      params: TokenFurnaceTypes.CallMethodParams<"convert">
+    ): Promise<TokenFurnaceTypes.CallMethodResult<"convert">> => {
+      return callMethod(
+        TokenFurnace,
+        this,
+        "convert",
+        params,
+        getContractByCodeHash
+      );
+    },
   };
 
   transact = {
@@ -382,6 +409,11 @@ export class TokenFurnaceInstance extends ContractInstance {
       params: TokenFurnaceTypes.SignExecuteMethodParams<"mint">
     ): Promise<TokenFurnaceTypes.SignExecuteMethodResult<"mint">> => {
       return signExecuteMethod(TokenFurnace, this, "mint", params);
+    },
+    convert: async (
+      params: TokenFurnaceTypes.SignExecuteMethodParams<"convert">
+    ): Promise<TokenFurnaceTypes.SignExecuteMethodResult<"convert">> => {
+      return signExecuteMethod(TokenFurnace, this, "convert", params);
     },
   };
 

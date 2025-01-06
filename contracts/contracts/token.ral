@@ -1,7 +1,7 @@
 import "std/nft_collection_interface"
 Contract TokenFurnace(
     nftTemplateId: ByteVec,
-    collectionUri: ByteVec,
+    collectionImageUri: ByteVec,
     mut totalSupply: U256
   ) implements INFTCollection {
 
@@ -22,18 +22,19 @@ Contract TokenFurnace(
       assert!(tokenIdToBurn != ALPH , ErrorCodes.TokenIdNotAccepted)
       assert!(amountToBurn > 0, ErrorCodes.CannotBurnZero)
       
-      if(withNft && false){
-       let _ =  mint{caller -> ALPH: minimalContractDeposit!()}(tokenIdToBurn, amountToBurn, caller)
+      let tokenIdHex = convert(tokenIdToBurn)
+      if(withNft){
+       let _ =  mint{caller -> ALPH: minimalContractDeposit!()}(tokenIdHex, amountToBurn, caller)
       }
 
-      emit Burned(caller, tokenIdToBurn, amountToBurn, withNft, blockTimeStamp!())
+      emit Burned(caller, tokenIdHex, amountToBurn, withNft, blockTimeStamp!())
       burnToken!(caller, tokenIdToBurn, amountToBurn)
    }
 
    @using(preapprovedAssets = true, updateFields = true)
    fn mint(tokenIdBurned: ByteVec, amountBurned: U256, burnerCaller: Address) -> (ByteVec) {
 
-     let (initialImmState, initialMutState) = BurnerNFT.encodeFields!(selfContractId!(), totalSupply, tokenIdBurned, amountBurned)
+     let (initialImmState, initialMutState) = BurnerNFT.encodeFields!(selfContractId!(), totalSupply, tokenIdBurned, amountBurned, convert(toByteVec!(burnerCaller)))
  
      let contractId = copyCreateSubContractWithToken!{burnerCaller -> ALPH: minimalContractDeposit!()}(
          toByteVec!(totalSupply),
@@ -48,11 +49,8 @@ Contract TokenFurnace(
      return contractId
    }
 
- // collection png https://arweave.net/hoxK8xC9wRjD_6HiOzhdY2jW0ZnJoF2f0N4FcSLXqzQ
- // collection json https://arweave.net/Z1HAdT_PGnxPLct4-u7l1Zl_h4DNdxzKev7tCDAEflc
-
     pub fn getCollectionUri() -> ByteVec {
-        return collectionUri
+        return b`data:application/json,{"name": "Token Burner Proof - Group `++ u256ToString!(groupOfAddress!(selfAddress!()))++ b`", "description": "Prove your tokens burn.","image": "` ++ collectionImageUri ++ b`"}`
     }
     
     pub fn totalSupply() -> U256 {
@@ -72,6 +70,19 @@ Contract TokenFurnace(
     pub fn validateNFT(nftId: ByteVec, nftIndex: U256) -> () {
         let expectedTokenContract =  nftByIndex(nftIndex)
         assert!(nftId == contractId!(expectedTokenContract), ErrorCodes.NFTNotPartOfCollection)
+    }
+
+    fn convert(array: ByteVec) -> ByteVec {
+      let hexBytes = [b`0`, b`1`, b`2`, b`3`, b`4`, b`5`, b`6`, b`7`, b`8`, b`9`, b`a`, b`b`, b`c`, b`d`, b`e`, b`f`]
+      let mut result = #
+      for(let mut offset = 0; offset < size!(array); offset = offset + 1) {
+         let byte = u256From1Byte!(byteVecSlice!(array, offset, offset + 1)) & 0xFF
+         let high = (byte >> 4) & 0x0F
+         let low = byte & 0x0F
+         result = result ++ hexBytes[high] ++ hexBytes[low]
+      }
+  
+      return result
     }
 
 }

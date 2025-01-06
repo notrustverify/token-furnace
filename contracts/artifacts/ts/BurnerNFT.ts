@@ -43,6 +43,7 @@ export namespace BurnerNFTTypes {
     nftIndex: bigint;
     tokenIdBurned: HexString;
     amountBurned: bigint;
+    burnedBy: HexString;
   };
 
   export type State = ContractState<Fields>;
@@ -143,7 +144,7 @@ export const BurnerNFT = new Factory(
   Contract.fromJson(
     BurnerNFTContractJson,
     "",
-    "de86ba673a50975a76b894d00590f4c907220136a3c32573024885245e6f5b75",
+    "80d0fff0dd5aba768a1fa0b2d16bad836f1eccef91704ede23970fea92a49a26",
     []
   )
 );

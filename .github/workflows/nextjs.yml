@@ -28,6 +28,9 @@ jobs:
   # Build job
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./appv2
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -65,7 +68,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            .next/cache
+            ./.next/cache
           # Generate a new cache whenever packages or source files change.
           key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
           # If source files changed but packages didn't, rebuild from a prior cache.
@@ -75,14 +78,15 @@ jobs:
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
       - name: Set Secrets and Change Dir
         run: | # Secrets needed on the server
-          echo "NEXT_PUBLIC_NODE_URL=${{vars.NEXT_PUBLIC_NODE_URL}}" >> ./app/.env
-          echo "NEXT_PUBLIC_NETWORK=${{vars.NEXT_PUBLIC_NETWORK}}" >> ./app/.env
+          echo "NEXT_PUBLIC_NODE_URL=${{vars.NEXT_PUBLIC_NODE_URL}}" >> .env
+          echo "NEXT_PUBLIC_NETWORK=${{vars.NEXT_PUBLIC_NETWORK}}" >> .env
       - name: Build with Next.js
-        run: ${{ steps.detect-package-manager.outputs.runner }} workspace my-contracts build && ${{ steps.detect-package-manager.outputs.runner }} workspace my-dapp build
+        run: |
+          ${{ steps.detect-package-manager.outputs.runner }} build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./app/out
+          path: ./appv2/out
 
   # Deployment job
   deploy:

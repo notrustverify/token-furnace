@@ -331,7 +331,7 @@ export const FurnacePage: FC = () => {
             </button>
           </div>
           
-          <div className={styles.checkboxContainer} hidden >
+          <div className={styles.checkboxContainer} >
             <label className={styles.checkboxLabel}>
               <input
                 disabled={isLoading || connectionStatus !== 'connected'}
