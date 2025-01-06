@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { useWallet } from '@alephium/web3';
+import { hexToString } from '@alephium/web3';
 import { useLanguage } from '../context/LanguageContext';
 import { FaFire } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
@@ -10,7 +10,10 @@ import { getContractFactory, getTokenList } from '../services/utils';
 import Image from 'next/image';
 
 const formatAmount = (amount, decimals) => {
-  const num = Number(amount) / Math.pow(10, decimals);
+  const amountBigInt = BigInt(amount);
+  const divisor = BigInt(10 ** decimals);
+  const num = Number(amountBigInt) / Number(divisor);
+  
   if (num >= 1e9) return (num / 1e9).toFixed(1) + 'B';
   if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M';
   if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K';
@@ -34,8 +37,16 @@ const formatTokenId = (tokenId) => {
 
 function BurnHistoryCard({ burn, theme, tokenList }) {
   const { t } = useLanguage();
-  const tokenMetadata = tokenList.find(token => token.id === burn.tokenId);
+  const tokenMetadata = tokenList.find(token => token.id === hexToString(burn.tokenId));
   
+  console.log('BurnHistoryCard data:', {
+    burn,
+    tokenMetadata,
+    amount: burn.amount,
+    decimals: burn.decimals,
+    formattedAmount: formatAmount(burn.amount, burn.decimals)
+  });
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -190,20 +201,19 @@ function BurnHistory() {
           pollingInterval: 15000,
           messageCallback: async (event) => {
             console.log(`Received burn event in group ${i}:`, event);
-            const tokenMetadata = tokenList.find(token => token.id === event.fields.tokenBurned);
+            const tokenMetadata = tokenList.find(token => token.id === hexToString(event.fields.tokenBurned));
             
             const newBurn = {
               txId: event.txId,
-              timestamp: new Date(Number(event.fields.timestamp)).getTime(),
+              timestamp: Number(event.fields.timestamp),
               tokenId: event.fields.tokenBurned,
               amount: event.fields.amount.toString(),
               burner: event.fields.caller,
-              tokenSymbol: tokenMetadata?.symbol,
-              decimals: tokenMetadata?.decimals ?? 0,
+              decimals: tokenMetadata?.decimals ?? 18,
               group: i
             };
 
-            console.log('Processing new burn:', newBurn);
+            
             setBurns(prevBurns => [newBurn, ...prevBurns]);
             updateTopBurners(newBurn);
             updateTopTokens(newBurn);
@@ -290,10 +300,10 @@ function BurnHistory() {
         tokenMap.set(token.tokenId, token);
       });
       
-      const tokenMetadata = tokenList.find(token => token.id === newBurn.tokenId);
+      const tokenMetadata = tokenList.find(token => token.id === hexToString(newBurn.tokenId));
       
-      const existingToken = tokenMap.get(newBurn.tokenId) || {
-        tokenId: newBurn.tokenId,
+      const existingToken = tokenMap.get(hexToString(newBurn.tokenId)) || {
+        tokenId: hexToString(newBurn.tokenId),
         symbol: tokenMetadata?.symbol,
         logoURI: tokenMetadata?.logoURI,
         burnCount: 0
@@ -305,7 +315,7 @@ function BurnHistory() {
         existingToken.symbol = tokenMetadata.symbol;
       }
       
-      tokenMap.set(newBurn.tokenId, existingToken);
+      tokenMap.set(hexToString(newBurn.tokenId), existingToken);
       
       return Array.from(tokenMap.values())
         .sort((a, b) => b.burnCount - a.burnCount)

@@ -84,45 +84,33 @@ function BurnInterface() {
   };
 
   const handleBurn = async () => {
-    if (!burnAmount) {
-      alert(t('enterAmount'));
-      return;
-    }
 
-    if (burnAmount === computedBalance) {
-      setShowConfirmModal(true);
-    } else {
-      await handleConfirmBurn();
-    }
-  };
+    if (!selectedToken || !burnAmount) return;
+    
+    try {
+      const floatToDecimals = rawAmount ? [rawAmount, 0] : convertToInt(burnAmount);
+      console.log(floatToDecimals);
+      const tx = await burn(
+        signer,
+        BigInt(floatToDecimals[0]),
+        Number(floatToDecimals[1]),
+        selectedToken?.id ?? '',
+        selectedToken?.decimals ?? 0,
+        wantNFT,
+        account?.group,
+        rawAmount != undefined? true : false
+      );
+      
+      setRawAmount(undefined);
+      updateBalanceForTx(tx.txId, 1);
+      setBurnSummary({
+        amount: burnAmount,
+        symbol: selectedToken.symbol,
+        txId: tx.txId
+      });
+    } catch (error) {
+      console.error("Error during burn:", error);
 
-  const handleConfirmBurn = async () => {
-    if (signer) {
-      try {
-        const cleanAmount = burnAmount.toString().replace(',', '.');
-        const floatToDecimals = rawAmount ? [rawAmount, 0] : convertToInt(cleanAmount);
-        
-        const tx = await burn(
-          signer,
-          BigInt(floatToDecimals[0]),
-          Number(floatToDecimals[1]),
-          selectedToken?.id ?? '',
-          selectedToken?.decimals ?? 0,
-          wantNFT,
-          account?.group,
-          rawAmount != undefined ? true : false
-        );
-        
-        setRawAmount(undefined);
-        updateBalanceForTx(tx.txId, 1);
-        setBurnSummary({
-          amount: burnAmount,
-          symbol: selectedToken.symbol,
-          txId: tx.txId
-        });
-      } catch (error) {
-        console.error("Error during burn:", error);
-      }
     }
     setShowConfirmModal(false);
   };
