@@ -73,9 +73,7 @@ function BurnInterface() {
           setBurnAmount(computedBalance);
         }
       } else {
-        const amount = (parseFloat(computedBalance.replace(',', '.')) * percentage / 100)
-          .toFixed(0)
-          .replace(',', '.');
+        const amount = (parseFloat(computedBalance) * percentage / 100).toFixed(selectedToken.decimals);
         setBurnAmount(amount);
         setRawAmount(undefined);
       }
@@ -86,32 +84,7 @@ function BurnInterface() {
     if (!selectedToken || !burnAmount) return;
     
     try {
-      let amountToConvert;
-      if (rawAmount) {
-        amountToConvert = rawAmount;
-      } else {
-        const cleanAmount = burnAmount.toString()
-          .replace(/\s/g, '')
-          .replace(/\./g, '')
-          .replace(',', '.');
-        
-        const formattedAmount = parseFloat(cleanAmount)
-          .toFixed(selectedToken.decimals)
-          .toString();
-        
-        amountToConvert = formattedAmount;
-      }
-
-      if (isNaN(Number(amountToConvert))) {
-        throw new Error('Invalid number format');
-      }
-
-      const floatToDecimals = rawAmount ? [rawAmount, 0] : convertToInt(amountToConvert, selectedToken.decimals);
-      
-      console.log("Amount to convert:", amountToConvert);
-      console.log("Converted values:", floatToDecimals);
-      console.log("Token decimals:", selectedToken.decimals);
-      
+      const floatToDecimals = rawAmount ? [rawAmount, 0] : convertToInt(burnAmount);
       const tx = await burn(
         signer,
         BigInt(floatToDecimals[0]),
@@ -120,7 +93,7 @@ function BurnInterface() {
         selectedToken?.decimals ?? 0,
         wantNFT,
         account?.group,
-        rawAmount != undefined ? true : false
+        rawAmount != undefined? true : false
       );
       
       setRawAmount(undefined);
@@ -132,7 +105,6 @@ function BurnInterface() {
       });
     } catch (error) {
       console.error("Error during burn:", error);
-      alert("Failed to process burn amount. Please check the number format.");
     }
   };
 
