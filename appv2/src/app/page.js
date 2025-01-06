@@ -241,19 +241,21 @@ function BurnInterface() {
                     </div>
                   )}
 
-                  <div className="relative">
-                    <input
-                      type="number"
-                      value={burnAmount}
-                      onChange={(e) => {setBurnAmount(e.target.value); setRawAmount(undefined)}}
-                      placeholder="0.00"
-                      className={`w-full p-3 rounded-lg transition-colors duration-200 ${
-                        isDark
-                          ? 'bg-gray-700 text-white border-gray-600'
-                          : 'bg-gray-50 text-gray-900 border-gray-200'
-                      } border focus:ring-2 focus:ring-orange-400 focus:border-transparent text-center`}
-                    />
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-2">
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <input
+                        type="number"
+                        value={burnAmount}
+                        onChange={(e) => {setBurnAmount(e.target.value); setRawAmount(undefined)}}
+                        placeholder="0.00"
+                        className={`w-full p-3 rounded-lg transition-colors duration-200 ${
+                          isDark
+                            ? 'bg-gray-700 text-white border-gray-600'
+                            : 'bg-gray-50 text-gray-900 border-gray-200'
+                        } border focus:ring-2 focus:ring-orange-400 focus:border-transparent text-center`}
+                      />
+                    </div>
+                    <div className="flex justify-end gap-2">
                       {[10, 50, 100].map((percentage) => (
                         <button
                           key={percentage}
