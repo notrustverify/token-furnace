@@ -85,6 +85,7 @@ function BurnInterface() {
     
     try {
       const floatToDecimals = rawAmount ? [rawAmount, 0] : convertToInt(burnAmount);
+      console.log(floatToDecimals);
       const tx = await burn(
         signer,
         BigInt(floatToDecimals[0]),
