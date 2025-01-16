@@ -9,9 +9,10 @@ Contract BurnerNFT(
 ) implements INFT {
   
   pub fn getTokenUri() -> ByteVec {
-    //let _ =  b`data:application/json,{"name": "Burn ` ++ u256ToString!(nftIndex)  ++ b`", "attributes": [{"trait_type": "Token id", "value": "` ++ tokenIdBurned ++ b`"}, {"trait_type": "Amount burned", "value": "` ++ u256ToString!(amountBurned) ++ b`"}, {"trait_type": "Timestamp", "value": "`++ u256ToString!(blockTimeStamp!()) ++ b`"}]}`
 
+    // return the metadata for the NFT directly sending json data and not being dependent on IPFS or Arweave
     return b`data:application/json,{"name": "Burn ` ++ u256ToString!(nftIndex)  ++ b`", "attributes": [{"trait_type": "Amount burned", "value": ` ++ u256ToString!(amountBurned) ++ b`}, {"trait_type": "Timestamp", "value": `++ u256ToString!(blockTimeStamp!()) ++ b`}, {"trait_type": "Token Id", "value": "`++ tokenIdBurned ++ b`"},  {"trait_type": "Burner", "value": "`++ burnedBy ++ b`"}]}`
+    
   }
 
   pub fn getCollectionIndex() -> (ByteVec, U256) {

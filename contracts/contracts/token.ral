@@ -1,24 +1,50 @@
 import "std/nft_collection_interface"
+
+// The TokenFurnace contract allows for the burning of tokens, optionally minting NFTs as proof of burn.
+// It manages a collection of NFTs, ensuring proper validation and tracking of burned tokens.
 Contract TokenFurnace(
     nftTemplateId: ByteVec,
     collectionImageUri: ByteVec,
     mut totalSupply: U256
   ) implements INFTCollection {
 
+   // Event emitted when tokens are burned.
+   // Parameters:
+   // - caller: The address of the account initiating the burn.
+   // - tokenBurned: The ID of the token being burned.
+   // - amount: The quantity of tokens burned.
+   // - nft: A boolean indicating if an NFT is minted as proof of burn.
+   // - timestamp: The block timestamp when the burn occurred.
    event Burned(caller: Address, tokenBurned: ByteVec, amount: U256, nft: Bool, timestamp: U256)
 
     enum ErrorCodes {
+      // Used when an invalid index is provided while accessing NFTs by index.
       IncorrectTokenIndex = 0
+      
+      // Triggered when an NFT cannot be found in the collection.
       NFTNotFound = 1
+
+      // Raised if an NFT does not belong to the specified collection.
       NFTNotPartOfCollection = 2
+
+      // Used when the token ID provided is not accepted for burning (e.g., ALPH tokens).
       TokenIdNotAccepted = 4
+
+      // Triggered when attempting to burn zero tokens, which is invalid.
       CannotBurnZero = 5
     }
 
 
    @using(assetsInContract = false, preapprovedAssets = true, checkExternalCaller = false)
+   // Burns a specified amount of tokens and optionally mints an NFT as proof of burn.
+   // Parameters:
+   // - tokenIdToBurn: The ID of the token to burn. This must not be the ALPH token.
+   // - amountToBurn: The amount of tokens to burn. Must be greater than zero.
+   // - withNft: If true, an NFT is minted to represent proof of the burn.
    pub fn burn(tokenIdToBurn: ByteVec, amountToBurn: U256, withNft: Bool) -> (){
       let caller = callerAddress!()
+
+      // ALPH tokens cannot be burned with this function
       assert!(tokenIdToBurn != ALPH , ErrorCodes.TokenIdNotAccepted)
       assert!(amountToBurn > 0, ErrorCodes.CannotBurnZero)
       
@@ -27,15 +53,25 @@ Contract TokenFurnace(
        let _ =  mint{caller -> ALPH: minimalContractDeposit!()}(tokenIdHex, amountToBurn, caller)
       }
 
+      // tracking interactions with the contract and burns
       emit Burned(caller, tokenIdHex, amountToBurn, withNft, blockTimeStamp!())
+
+      // burn the tokens
       burnToken!(caller, tokenIdToBurn, amountToBurn)
    }
 
    @using(preapprovedAssets = true, updateFields = true)
+   // Mint an NFT as proof of burn.
+    // Parameters:
+    // - tokenIdBurned: The ID of the token burned.
+    // - amountBurned: The amount of tokens burned.
+    // - burnerCaller: The address of the account initiating the burn.
    fn mint(tokenIdBurned: ByteVec, amountBurned: U256, burnerCaller: Address) -> (ByteVec) {
 
+     // Encode the initial state and mutable state for the NFT contract
      let (initialImmState, initialMutState) = BurnerNFT.encodeFields!(selfContractId!(), totalSupply, tokenIdBurned, amountBurned, convert(toByteVec!(burnerCaller)))
  
+     // Create a new NFT contract to represent the burned tokens
      let contractId = copyCreateSubContractWithToken!{burnerCaller -> ALPH: minimalContractDeposit!()}(
          toByteVec!(totalSupply),
          nftTemplateId,
@@ -44,11 +80,13 @@ Contract TokenFurnace(
          1,
          burnerCaller
      )
- 
+     
+     // increase the number of minted NFTs
      totalSupply = totalSupply + 1
      return contractId
    }
 
+    // Returns the URI for the collection metadata. Useful to display the collection in marketplaces.
     pub fn getCollectionUri() -> ByteVec {
         return b`data:application/json,{"name": "Token Burner Proof - Group `++ u256ToString!(groupOfAddress!(selfAddress!()))++ b`", "description": "Prove your tokens burn.","image": "` ++ collectionImageUri ++ b`"}`
     }
@@ -56,7 +94,6 @@ Contract TokenFurnace(
     pub fn totalSupply() -> U256 {
         return totalSupply
     }
-
 
     pub fn nftByIndex(index: U256) -> INFT {
         checkCaller!(index < totalSupply(), ErrorCodes.IncorrectTokenIndex)
@@ -72,6 +109,7 @@ Contract TokenFurnace(
         assert!(nftId == contractId!(expectedTokenContract), ErrorCodes.NFTNotPartOfCollection)
     }
 
+    // Converts a byte array to a hexadecimal string. Used to change the token ID to a readable format.
     fn convert(array: ByteVec) -> ByteVec {
       let hexBytes = [b`0`, b`1`, b`2`, b`3`, b`4`, b`5`, b`6`, b`7`, b`8`, b`9`, b`a`, b`b`, b`c`, b`d`, b`e`, b`f`]
       let mut result = #
