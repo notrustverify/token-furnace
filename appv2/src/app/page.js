@@ -72,7 +72,14 @@ function BurnInterface() {
         const tokenBalance = balance.tokenBalances.find(token => token.id === selectedToken.id);
         if (tokenBalance) {
           const balanceWithDecimals = (Number(tokenBalance.amount) / Math.pow(10, selectedToken.decimals));
-          setBurnAmount(balanceWithDecimals.toString());
+
+          // Format without scientific notation
+        const formattedAmount = balanceWithDecimals.toLocaleString('fullwide', {
+          useGrouping: false,
+          maximumFractionDigits: selectedToken.decimals
+        });
+
+          setBurnAmount(formattedAmount);
           setRawAmount(tokenBalance.amount);
         }
       } else {
