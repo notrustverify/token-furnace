@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { hexToString } from '@alephium/web3';
 import { useLanguage } from '../context/LanguageContext';
@@ -159,6 +159,7 @@ function BurnHistory() {
   const [totalBurns, setTotalBurns] = useState(0);
   const [topBurners, setTopBurners] = useState([]);
   const [topTokens, setTopTokens] = useState([]);
+  const subscriptionsRef = useRef([]);
 
   useEffect(() => {
     document.body.className = '';
@@ -193,16 +194,24 @@ function BurnHistory() {
   // Event subscription with logging
   useEffect(() => {
     console.log('Setting up event subscriptions, tokenList length:', tokenList.length);
-    
+
+    // Clean up any existing subscriptions before creating new ones
+    subscriptionsRef.current.forEach(subscription => {
+      if (subscription && typeof subscription.unsubscribe === 'function') {
+        subscription.unsubscribe();
+      }
+    });
+    subscriptionsRef.current = [];
+
     async function subscribeEvents() {
       for (let i = 0; i < 4; i++) {
         console.log(`Subscribing to events for group ${i}...`);
-        getContractFactory(i).subscribeBurnedEvent({
+        const subscription = getContractFactory(i).subscribeBurnedEvent({
           pollingInterval: 15000,
           messageCallback: async (event) => {
             console.log(`Received burn event in group ${i}:`, event);
             const tokenMetadata = tokenList.find(token => token.id === hexToString(event.fields.tokenBurned));
-            
+
             const newBurn = {
               txId: event.txId,
               timestamp: Number(event.fields.timestamp),
@@ -213,8 +222,13 @@ function BurnHistory() {
               group: i
             };
 
-            
-            setBurns(prevBurns => [newBurn, ...prevBurns]);
+            // Deduplicate by txId
+            setBurns(prevBurns => {
+              if (prevBurns.some(burn => burn.txId === newBurn.txId)) {
+                return prevBurns;
+              }
+              return [newBurn, ...prevBurns];
+            });
             updateTopBurners(newBurn);
             updateTopTokens(newBurn);
             return Promise.resolve();
@@ -226,9 +240,21 @@ function BurnHistory() {
             return Promise.resolve();
           },
         });
+        subscriptionsRef.current.push(subscription);
       }
     }
     subscribeEvents();
+
+    // Cleanup: unsubscribe from all subscriptions when effect re-runs or component unmounts
+    return () => {
+      console.log('Cleaning up event subscriptions...');
+      subscriptionsRef.current.forEach(subscription => {
+        if (subscription && typeof subscription.unsubscribe === 'function') {
+          subscription.unsubscribe();
+        }
+      });
+      subscriptionsRef.current = [];
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenList]);
 
