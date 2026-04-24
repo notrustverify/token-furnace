@@ -2,6 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
+export * from "./ALPHFurnace";
 export * from "./BurnerNFT";
 export * from "./TokenFurnace";
+export * from "./contracts";
 export * from "./scripts";

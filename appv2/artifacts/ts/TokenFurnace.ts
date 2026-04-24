@@ -186,7 +186,7 @@ class Factory extends ContractFactory<
     getCollectionUri: async (
       params: Omit<
         TestContractParamsWithoutMaps<TokenFurnaceTypes.Fields, never>,
-        "testArgs"
+        "args"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(
@@ -199,7 +199,7 @@ class Factory extends ContractFactory<
     totalSupply: async (
       params: Omit<
         TestContractParamsWithoutMaps<TokenFurnaceTypes.Fields, never>,
-        "testArgs"
+        "args"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "totalSupply", params, getContractByCodeHash);

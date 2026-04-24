@@ -5,11 +5,11 @@ import { FaFire } from 'react-icons/fa';
 import { useWallet } from '@alephium/web3-react';
 import { useLanguage } from './context/LanguageContext';
 import { useTheme } from './context/ThemeContext';
-import { getContractFactory, convertToInt, getTokenList } from "./services/utils";
+import { getContractFactory, convertToInt, getTokenList, ALPH_TOKEN_METADATA, getNodeUrl } from "./services/utils";
 import { burn } from "./services/token.service";
 import { useBalance } from "@alephium/web3-react";
 import Image from 'next/image';
-import { web3 } from '@alephium/web3';
+import { web3, ALPH_TOKEN_ID, DUST_AMOUNT, MINIMAL_CONTRACT_DEPOSIT } from '@alephium/web3';
 import ConfirmBurnModal from './components/ConfirmBurnModal';
 
 function BurnInterface() {
@@ -31,31 +31,48 @@ function BurnInterface() {
   useEffect(() => {
     document.body.className = '';
     document.body.classList.add(theme);
-    web3.setCurrentNodeProvider(process.env.NEXT_PUBLIC_NODE_URL ?? "https://node.alphaga.app");
+    web3.setCurrentNodeProvider(getNodeUrl());
   }, [theme]);
 
   useEffect(() => {
     const fetchTokens = async () => {
+      let filteredTokens = [];
       try {
         const tokens = await getTokenList();
-        const filteredTokens = tokens.filter(token =>
+        filteredTokens = tokens.filter(token =>
           balance?.tokenBalances?.some(balanceToken =>
             balanceToken.id === token.id && balanceToken.amount > 0n
           ) ?? false
         );
-        setTokenList(filteredTokens);
-        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching tokens:", error);
-        setIsLoading(false);
       }
+
+      // Always include ALPH at the top so the user can pick it for burning,
+      // regardless of whether the remote token-list fetch succeeded. ALPH is
+      // the native coin so it is never listed in tokenBalances anyway.
+      const list = [ALPH_TOKEN_METADATA, ...filteredTokens.filter(t => t.id !== ALPH_TOKEN_ID)];
+      setTokenList(list);
+      setIsLoading(false);
     };
 
     fetchTokens();
   }, [balance]);
 
   useEffect(() => {
-    if (balance?.tokenBalances && selectedToken) {
+    if (!selectedToken) return;
+
+    if (selectedToken.id === ALPH_TOKEN_ID) {
+      if (balance?.balance) {
+        const balanceWithDecimals = Number(balance.balance) / Math.pow(10, selectedToken.decimals);
+        setComputedBalance(balanceWithDecimals.toString());
+      } else {
+        setComputedBalance('0');
+      }
+      return;
+    }
+
+    if (balance?.tokenBalances) {
       const tokenBalance = balance.tokenBalances.find(token => token.id === selectedToken.id);
       if (tokenBalance) {
         const balanceWithDecimals = Number(tokenBalance.amount) / Math.pow(10, selectedToken.decimals);
@@ -69,15 +86,32 @@ function BurnInterface() {
   const handlePercentageClick = (percentage) => {
     if (selectedToken && computedBalance) {
       if (percentage === 100) {
+        if (selectedToken.id === ALPH_TOKEN_ID) {
+          // Reserve some ALPH for gas, sub-contract deposit (if NFT), and dust.
+          const gasReserve = 2n * 10n ** 17n; // ~0.2 ALPH safety buffer for gas
+          const overhead = (wantNFT ? MINIMAL_CONTRACT_DEPOSIT : 0n) + 2n * DUST_AMOUNT + gasReserve;
+          const raw = BigInt(balance.balance);
+          const spendable = raw > overhead ? raw - overhead : 0n;
+
+          const formattedAmount = (Number(spendable) / Math.pow(10, selectedToken.decimals))
+            .toLocaleString('fullwide', {
+              useGrouping: false,
+              maximumFractionDigits: selectedToken.decimals
+            });
+
+          setBurnAmount(formattedAmount);
+          setRawAmount(spendable);
+          return;
+        }
+
         const tokenBalance = balance.tokenBalances.find(token => token.id === selectedToken.id);
         if (tokenBalance) {
           const balanceWithDecimals = (Number(tokenBalance.amount) / Math.pow(10, selectedToken.decimals));
 
-          // Format without scientific notation
-        const formattedAmount = balanceWithDecimals.toLocaleString('fullwide', {
-          useGrouping: false,
-          maximumFractionDigits: selectedToken.decimals
-        });
+          const formattedAmount = balanceWithDecimals.toLocaleString('fullwide', {
+            useGrouping: false,
+            maximumFractionDigits: selectedToken.decimals
+          });
 
           setBurnAmount(formattedAmount);
           setRawAmount(tokenBalance.amount);

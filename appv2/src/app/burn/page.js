@@ -1,13 +1,26 @@
 "use client";
 import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { hexToString } from '@alephium/web3';
+import { hexToString, stringToHex, ALPH_TOKEN_ID } from '@alephium/web3';
 import { useLanguage } from '../context/LanguageContext';
 import { FaFire } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
 import { web3 } from '@alephium/web3';
-import { getContractFactory, getTokenList } from '../services/utils';
+import {
+  getContractFactory,
+  getAlphFurnaceFactory,
+  getTokenList,
+  ALPH_TOKEN_METADATA,
+  getNodeUrl
+} from '../services/utils';
 import Image from 'next/image';
+
+// ALPHFurnace.BurnedALPH events do not carry a tokenBurned field (ALPH is
+// implicit). We normalise to the same shape TokenFurnace.Burned emits by
+// encoding ALPH_TOKEN_ID through stringToHex, so that downstream code that
+// does `hexToString(burn.tokenId)` resolves to ALPH_TOKEN_ID and therefore
+// matches ALPH_TOKEN_METADATA in the tokenList.
+const ALPH_ENCODED_TOKEN_ID = stringToHex(ALPH_TOKEN_ID);
 
 const formatAmount = (amount, decimals) => {
   const amountBigInt = BigInt(amount);
@@ -168,11 +181,7 @@ function BurnHistory() {
 
   useEffect(() => {
     console.log('Setting up node provider...');
-    web3.setCurrentNodeProvider(
-      process.env.NEXT_PUBLIC_NODE_URL ?? "https://node.alphaga.app",
-      undefined,
-      undefined
-    );
+    web3.setCurrentNodeProvider(getNodeUrl(), undefined, undefined);
     console.log('Node provider setup complete');
   }, []);
 
@@ -183,9 +192,10 @@ function BurnHistory() {
       try {
         const tokens = await getTokenList();
         console.log('Token list fetched:', tokens);
-        setTokenList(tokens);
+        setTokenList([ALPH_TOKEN_METADATA, ...tokens]);
       } catch (error) {
         console.error('Error fetching token list:', error);
+        setTokenList([ALPH_TOKEN_METADATA]);
       }
     };
     fetchTokenList();
@@ -203,44 +213,91 @@ function BurnHistory() {
     });
     subscriptionsRef.current = [];
 
+    const ingestBurn = (newBurn) => {
+      setBurns(prevBurns => {
+        if (prevBurns.some(burn => burn.txId === newBurn.txId)) {
+          return prevBurns;
+        }
+        return [newBurn, ...prevBurns];
+      });
+      updateTopBurners(newBurn);
+      updateTopTokens(newBurn);
+    };
+
+    // The Alephium node returns 404 on /events/contract/{address} for contracts
+    // that have never emitted any event yet (e.g. freshly-deployed furnaces).
+    // We must NOT treat that as a fatal error for the whole page: just log
+    // and keep the subscription alive so we pick up the first real burn.
+    const isNoEventsYet = (error) => {
+      const msg = error?.message ?? String(error);
+      return /404|not\s*found|no events/i.test(msg);
+    };
+
     async function subscribeEvents() {
       for (let i = 0; i < 4; i++) {
-        console.log(`Subscribing to events for group ${i}...`);
-        const subscription = getContractFactory(i).subscribeBurnedEvent({
-          pollingInterval: 15000,
-          messageCallback: async (event) => {
-            console.log(`Received burn event in group ${i}:`, event);
-            const tokenMetadata = tokenList.find(token => token.id === hexToString(event.fields.tokenBurned));
+        try {
+          console.log(`Subscribing to token-furnace events for group ${i}...`);
+          const tokenSubscription = getContractFactory(i).subscribeBurnedEvent({
+            pollingInterval: 15000,
+            messageCallback: async (event) => {
+              console.log(`Received burn event in group ${i}:`, event);
+              const meta = tokenList.find(token => token.id === hexToString(event.fields.tokenBurned));
 
-            const newBurn = {
-              txId: event.txId,
-              timestamp: Number(event.fields.timestamp),
-              tokenId: event.fields.tokenBurned,
-              amount: event.fields.amount.toString(),
-              burner: event.fields.caller,
-              decimals: tokenMetadata?.decimals ?? 18,
-              group: i
-            };
-
-            // Deduplicate by txId
-            setBurns(prevBurns => {
-              if (prevBurns.some(burn => burn.txId === newBurn.txId)) {
-                return prevBurns;
+              ingestBurn({
+                txId: event.txId,
+                timestamp: Number(event.fields.timestamp),
+                tokenId: event.fields.tokenBurned,
+                amount: event.fields.amount.toString(),
+                burner: event.fields.caller,
+                decimals: meta?.decimals ?? 18,
+                group: i
+              });
+              return Promise.resolve();
+            },
+            errorCallback: (error) => {
+              if (isNoEventsYet(error)) {
+                console.log(`TokenFurnace group ${i} has no events yet, will keep polling`);
+              } else {
+                console.error(`Error from contract factory ${i}:`, error);
               }
-              return [newBurn, ...prevBurns];
-            });
-            updateTopBurners(newBurn);
-            updateTopTokens(newBurn);
-            return Promise.resolve();
-          },
-          errorCallback: (error, subscription) => {
-            console.error(`Error from contract factory ${i}:`, error);
-            setError(error.message);
-            subscription.unsubscribe();
-            return Promise.resolve();
-          },
-        });
-        subscriptionsRef.current.push(subscription);
+              return Promise.resolve();
+            },
+          });
+          subscriptionsRef.current.push(tokenSubscription);
+        } catch (err) {
+          console.warn(`Skipping TokenFurnace subscription for group ${i}:`, err.message);
+        }
+
+        try {
+          console.log(`Subscribing to alph-furnace events for group ${i}...`);
+          const alphSubscription = getAlphFurnaceFactory(i).subscribeBurnedALPHEvent({
+            pollingInterval: 15000,
+            messageCallback: async (event) => {
+              console.log(`Received ALPH burn event in group ${i}:`, event);
+              ingestBurn({
+                txId: event.txId,
+                timestamp: Number(event.fields.timestamp),
+                tokenId: ALPH_ENCODED_TOKEN_ID,
+                amount: event.fields.amount.toString(),
+                burner: event.fields.caller,
+                decimals: ALPH_TOKEN_METADATA.decimals,
+                group: i
+              });
+              return Promise.resolve();
+            },
+            errorCallback: (error) => {
+              if (isNoEventsYet(error)) {
+                console.log(`ALPHFurnace group ${i} has no events yet, will keep polling`);
+              } else {
+                console.error(`Error from ALPH furnace ${i}:`, error);
+              }
+              return Promise.resolve();
+            },
+          });
+          subscriptionsRef.current.push(alphSubscription);
+        } catch (err) {
+          console.warn(`Skipping ALPH furnace subscription for group ${i}:`, err.message);
+        }
       }
     }
     subscribeEvents();
@@ -271,10 +328,18 @@ function BurnHistory() {
         } catch (error) {
           console.error(`Error fetching burns count for group ${i}:`, error);
         }
+
+        try {
+          const alphCount = await getAlphFurnaceFactory(i).getContractEventsCurrentCount();
+          console.log(`Group ${i} ALPH burn count:`, alphCount);
+          total += Number(alphCount);
+        } catch (error) {
+          console.warn(`No ALPH furnace event count for group ${i}:`, error.message);
+        }
       }
       console.log('Total burns:', total);
       setTotalBurns(total);
-      setIsLoading(false); // Important: Set loading to false after fetching total burns
+      setIsLoading(false);
     }
     fetchTotalBurns();
   }, []);

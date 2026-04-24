@@ -12,6 +12,8 @@ import {
   BurnerNFTInstance,
   TokenFurnace,
   TokenFurnaceInstance,
+  ALPHFurnace,
+  ALPHFurnaceInstance,
 } from ".";
 import { default as mainnetDeployments } from "../../deployments/.deployments.mainnet.json";
 import { default as testnetDeployments } from "../../deployments/.deployments.testnet.json";
@@ -20,29 +22,33 @@ import { default as devnetDeployments } from "../../deployments/.deployments.dev
 export type Deployments = {
   deployerAddress: string;
   contracts: {
-    BurnerNFT?: DeployContractExecutionResult<BurnerNFTInstance>;
-    TokenFurnace?: DeployContractExecutionResult<TokenFurnaceInstance>;
+    BurnerNFT: DeployContractExecutionResult<BurnerNFTInstance>;
+    TokenFurnace: DeployContractExecutionResult<TokenFurnaceInstance>;
+    ALPHFurnace?: DeployContractExecutionResult<ALPHFurnaceInstance>;
   };
 };
 
 function toDeployments(json: any): Deployments {
   const contracts = {
-    BurnerNFT:
-      json.contracts["BurnerNFT"] === undefined
+    BurnerNFT: {
+      ...json.contracts["BurnerNFT"],
+      contractInstance: BurnerNFT.at(
+        json.contracts["BurnerNFT"].contractInstance.address
+      ),
+    },
+    TokenFurnace: {
+      ...json.contracts["TokenFurnace"],
+      contractInstance: TokenFurnace.at(
+        json.contracts["TokenFurnace"].contractInstance.address
+      ),
+    },
+    ALPHFurnace:
+      json.contracts["ALPHFurnace"] === undefined
         ? undefined
         : {
-            ...json.contracts["BurnerNFT"],
-            contractInstance: BurnerNFT.at(
-              json.contracts["BurnerNFT"].contractInstance.address
-            ),
-          },
-    TokenFurnace:
-      json.contracts["TokenFurnace"] === undefined
-        ? undefined
-        : {
-            ...json.contracts["TokenFurnace"],
-            contractInstance: TokenFurnace.at(
-              json.contracts["TokenFurnace"].contractInstance.address
+            ...json.contracts["ALPHFurnace"],
+            contractInstance: ALPHFurnace.at(
+              json.contracts["ALPHFurnace"].contractInstance.address
             ),
           },
   };

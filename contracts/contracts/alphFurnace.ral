@@ -1,0 +1,103 @@
+import "std/nft_collection_interface"
+
+// ALPHFurnace locks ALPH forever inside the contract (effectively "burning" it,
+// since ALPH itself cannot be destroyed with burnToken!), and optionally mints
+// a BurnerNFT sub-contract as proof of burn. It reuses the already-deployed
+// BurnerNFT template contract, so nftBurnerTemplate.ral does not need to be
+// redeployed, and the existing TokenFurnace (token.ral) is left untouched.
+Contract ALPHFurnace(
+    nftTemplateId: ByteVec,
+    collectionImageUri: ByteVec,
+    mut totalSupply: U256
+  ) implements INFTCollection {
+
+    // Event emitted when ALPH is burned.
+    event BurnedALPH(caller: Address, amount: U256, nft: Bool, timestamp: U256)
+
+    enum ErrorCodes {
+        IncorrectTokenIndex = 0
+        NFTNotFound = 1
+        NFTNotPartOfCollection = 2
+        CannotBurnZero = 5
+    }
+
+    // assetsInContract = true because the burned ALPH is permanently locked
+    // inside this contract's UTXO (there is no public function that spends it).
+    @using(preapprovedAssets = true, assetsInContract = true, checkExternalCaller = false)
+    pub fn burn(amountToBurn: U256, withNft: Bool) -> () {
+        let caller = callerAddress!()
+
+        assert!(amountToBurn > 0, ErrorCodes.CannotBurnZero)
+
+        // Permanently lock the caller's ALPH inside the contract.
+        transferTokenToSelf!(caller, ALPH, amountToBurn)
+
+        if (withNft) {
+            let _ = mint{caller -> ALPH: minimalContractDeposit!()}(amountToBurn, caller)
+        }
+
+        emit BurnedALPH(caller, amountToBurn, withNft, blockTimeStamp!())
+    }
+
+    @using(preapprovedAssets = true, updateFields = true)
+    fn mint(amountBurned: U256, burnerCaller: Address) -> (ByteVec) {
+        let (initialImmState, initialMutState) = BurnerNFT.encodeFields!(
+            selfContractId!(),
+            totalSupply,
+            convert(ALPH),
+            amountBurned,
+            convert(toByteVec!(burnerCaller))
+        )
+
+        let contractId = copyCreateSubContractWithToken!{burnerCaller -> ALPH: minimalContractDeposit!()}(
+            toByteVec!(totalSupply),
+            nftTemplateId,
+            initialImmState,
+            initialMutState,
+            1,
+            burnerCaller
+        )
+
+        totalSupply = totalSupply + 1
+        return contractId
+    }
+
+    pub fn getCollectionUri() -> ByteVec {
+        return b`data:application/json,{"name": "ALPH Burner Proof - Group `
+            ++ u256ToString!(groupOfAddress!(selfAddress!()))
+            ++ b`", "description": "Prove your ALPH burns.","image": "`
+            ++ collectionImageUri ++ b`"}`
+    }
+
+    pub fn totalSupply() -> U256 {
+        return totalSupply
+    }
+
+    pub fn nftByIndex(index: U256) -> INFT {
+        checkCaller!(index < totalSupply(), ErrorCodes.IncorrectTokenIndex)
+
+        let nftTokenId = subContractId!(toByteVec!(index))
+        assert!(contractExists!(nftTokenId), ErrorCodes.NFTNotFound)
+
+        return INFT(nftTokenId)
+    }
+
+    pub fn validateNFT(nftId: ByteVec, nftIndex: U256) -> () {
+        let expectedTokenContract = nftByIndex(nftIndex)
+        assert!(nftId == contractId!(expectedTokenContract), ErrorCodes.NFTNotPartOfCollection)
+    }
+
+    // Converts a byte array to a hexadecimal string. Used so the token id is
+    // embeddable into the NFT's JSON metadata without breaking it.
+    fn convert(array: ByteVec) -> ByteVec {
+        let hexBytes = [b`0`, b`1`, b`2`, b`3`, b`4`, b`5`, b`6`, b`7`, b`8`, b`9`, b`a`, b`b`, b`c`, b`d`, b`e`, b`f`]
+        let mut result = #
+        for (let mut offset = 0; offset < size!(array); offset = offset + 1) {
+            let byte = u256From1Byte!(byteVecSlice!(array, offset, offset + 1)) & 0xFF
+            let high = (byte >> 4) & 0x0F
+            let low = byte & 0x0F
+            result = result ++ hexBytes[high] ++ hexBytes[low]
+        }
+        return result
+    }
+}

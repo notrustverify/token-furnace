@@ -1,5 +1,5 @@
 {
-  "fullNodeVersion": "v3.8.8",
+  "fullNodeVersion": "v4.4.0",
   "compilerOptionsUsed": {
     "ignoreUnusedConstantsWarnings": false,
     "ignoreUnusedVariablesWarnings": false,
@@ -8,12 +8,19 @@
     "ignoreUpdateFieldsCheckWarnings": false,
     "ignoreCheckExternalCallerWarnings": false,
     "ignoreUnusedFunctionReturnWarnings": false,
-    "skipAbstractContractCheck": false
+    "skipAbstractContractCheck": false,
+    "skipTests": false
   },
   "infos": {
+    "ALPHFurnace": {
+      "sourceFile": "alphFurnace.ral",
+      "sourceCodeHash": "5c0eaaca07923050d60b55f6fca7171c829ec7a7bcee3991a007200ff9be4430",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "c8a1f9396484ec1179af02d2182dc6f386d7500897cd9c383389df19332d7968"
+    },
     "BurnerNFT": {
       "sourceFile": "nftBurnerTemplate.ral",
-      "sourceCodeHash": "cbe6ce771aa99cc3df4f2607adb87dae7234921675d48287351437546a40314a",
+      "sourceCodeHash": "bfcf484cb04cb6e2f26d7d52196dcf91fbf5600204e9ff0cd38978f45eb77e9e",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "80d0fff0dd5aba768a1fa0b2d16bad836f1eccef91704ede23970fea92a49a26"
     },
@@ -31,7 +38,7 @@
     },
     "TokenFurnace": {
       "sourceFile": "token.ral",
-      "sourceCodeHash": "7f01f08a14cadddd689417d8c7c9221d1944ba558cf1209982a90c3b01fed6de",
+      "sourceCodeHash": "b87d787c31a1ab46fa6dea6bdedf4951cb3b791c0ab234fec0a0f8487911084f",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "b1fc1809498587ee52f79c339c41533972a701865f38a1e9e05ab1dcf31b64e2"
     }
