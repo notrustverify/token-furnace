@@ -10,7 +10,7 @@ export function ThemeProvider({ children }) {
   useEffect(() => {
     setIsClient(true);
     const stored = localStorage.getItem('theme');
-    if (stored) {
+    if (stored === 'dark' || stored === 'light') {
       setTheme(stored);
     }
   }, []);
@@ -26,7 +26,7 @@ export function ThemeProvider({ children }) {
     if (metaThemeColor) {
       metaThemeColor.setAttribute(
         'content',
-        theme === 'dark' ? '#0f172a' : '#f1f5f9'
+        theme === 'dark' ? '#141615' : '#f6f5f2'
       );
     }
 
